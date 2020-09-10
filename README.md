@@ -4,8 +4,8 @@
 
 pip freeze > requirements.txt
 
-git config user.name "NombredeUsuario"
-
+git config user.name "nombredeusuario"
+git config user.email "email"
 
 python3 -m venv env
 
