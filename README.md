@@ -4,7 +4,7 @@
 
 pip freeze > requirements.txt
 
-git config user.name "Nombre de Usuario"
+git config user.name "NombredeUsuario"
 
 
 python3 -m venv env
@@ -24,10 +24,10 @@ def hola_mundo():
   return "Hola, Mundo!"
 
 
-# flask depends on this env variable to find the main file
+# flask depende de esta variable de entorno para encontrar el archivo principal
 export FLASK_APP=app.py
 
-# now we just need to ask flask to run
+# Ahora solo debemos decirle a flask que corra
 flask run
 
 # * Serving Flask app "hello"
