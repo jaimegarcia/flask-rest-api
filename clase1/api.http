@@ -14,3 +14,18 @@ GET http://localhost:5000/estudiantes
 GET http://localhost:5000/estudiantes/{{cedula}}
 
 
+
+
+### Agregar nuevo estudiante
+POST http://localhost:5000/estudiantes
+Content-Type: application/json
+
+{
+    "cedula":2354656,
+    "nombre":"Julian",
+    "apellido":"Parra",
+    "correo":"julian.parra@misena.edu.co",
+    "carrera":"Industrial"
+  }
+
+

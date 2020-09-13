@@ -362,15 +362,17 @@ if __name__ == '__main__':
 
 Acabamos de construir nuestro primer REST API 🥳 
 
-REST
+REST (Representational State Transfer) es una interfaz para conectar sistamas basados en el protocolo HTTP. 
 
-REpresentational State Transfer*
-- Concepts include:
-• Separation of Client and Server
-• Server Requests are Stateless
-• Cacheable Requests
-• Uniform Interface
+Ventajas
+- Nos permite separar el client y el servidor
+- Podemos crear pequeños servicios (microservicios) orientados a una tarea
+- Facilita la escalabilidad, se pueden tener varios servidores con balanceadores de carga
+- REST se ha vuelto un estándar mundial, por lo que la mayoría de desarrolladores sabe trabajar con él
 
+REST es utilizada por la mayoría de empresas de tecnología del mundo, incluyendo a Google, Netflix, Twitter, Amazon, Facebook y Microsoft
+
+#### Buenas prácticas a la hora de diseñar una REST API
 
 Use pronombres en plural para indicar los recursos asociados
 ```
@@ -415,7 +417,7 @@ Tipos de Parámetros que acepta Flask
 | uuid  | Admite strings UUID (Identificadores únicos) |
 
 
-El verbo que acabamoos de utilizar es el GET, existen otros verbos en el Protocolo HTTP, debemos usarlos siempre que sea posible
+El verbo que acabamos de utilizar es el GET, existen otros verbos en el Protocolo HTTP, debemos usarlos siempre que sea posible:
 
 
 GET
@@ -429,9 +431,14 @@ PATCH
 DELETE
 - Borra un recurso existente
 
-Si es necesario se puede utilizar otros verbos, 
+Si es necesario se puede utilizar otros verbos. La siguiente ruta sería para aprobar la petición 12 del estudiante 1324345
 
+```
 POST /estudiantes/1324345/peticiones/12/aprobar
+```
+
+
+Respuestas esperadas de cada verbo (Buenas prácticas)
 
 
 | Recurso  | GET | POST | PUT | DELETE |
@@ -447,8 +454,19 @@ Idempotencia: Operación que puede ser aplica múltiples veces, sin cambiar el r
 
 
 
+Agreguemos el verbo POST para agregar un nuevo estudiante:
 
-
+```python
+@app.route("/estudiantes",methods=['GET', 'POST'])
+def obtener_estudiantes():
+  if request.method == 'GET':
+    lista_estudiantes=[f"{estudiantes_db[key]['nombre']} {estudiantes_db[key]['apellido']}" for key in estudiantes_db.keys()]
+    return f"Los estudiantes de este curso son {', '.join(lista_estudiantes)}"
+  else:
+    nuevo_estudiante_id=request.json["cedula"]
+    estudiantes_db[str(nuevo_estudiante_id)]=request.json
+    return f"Estudiante con ID {nuevo_estudiante_id} agregado"
+```
 
 
 Diseñando resultados

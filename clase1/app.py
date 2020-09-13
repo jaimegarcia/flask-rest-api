@@ -48,11 +48,15 @@ def saludo(nombre):
   return f"Hola {titulo} {nombre}"
 
 
-@app.route("/estudiantes")
+@app.route("/estudiantes",methods=['GET', 'POST'])
 def obtener_estudiantes():
-  print('Hello world!')  
-  lista_estudiantes=[f"{estudiantes_db[key]['nombre']} {estudiantes_db[key]['apellido']}" for key in estudiantes_db.keys()]
-  return f"Los estudiantes de este curso son {', '.join(lista_estudiantes)}"
+  if request.method == 'GET':
+    lista_estudiantes=[f"{estudiantes_db[key]['nombre']} {estudiantes_db[key]['apellido']}" for key in estudiantes_db.keys()]
+    return f"Los estudiantes de este curso son {', '.join(lista_estudiantes)}"
+  else:
+    nuevo_estudiante_id=request.json["cedula"]
+    estudiantes_db[str(nuevo_estudiante_id)]=request.json
+    return f"Estudiante con ID {nuevo_estudiante_id} agregado"
 
 @app.route("/estudiantes/<int:id>")
 def obtener_estudiante(id):
