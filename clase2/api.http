@@ -1,0 +1,35 @@
+
+
+
+###
+GET http://localhost:5000/estudiantes
+
+
+
+###
+POST http://localhost:5000/add
+Content-Type: application/json
+
+{"id":"15","nombre":"Jorge Hernandez","notas":[4,5,6,7,8]}
+
+
+###
+GET http://localhost:5000/list
+
+###
+POST http://localhost:5000/update/15
+Content-Type: application/json
+
+{"nombre":"Roberto"}
+### Agenda Estudiante Reserva un esppacio de asesoria, tema
+# Estudiante
+# Centro
+# Asunto
+# Equipo
+# Tiempo
+# Fecha
+# Tareas
+# Lista de tareas por hacer
+# Inserta Tarea
+# Actualizar Tarea (Estado, Fecha)
+# Borrar Tarea
