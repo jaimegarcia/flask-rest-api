@@ -4,15 +4,15 @@ CLASE 1
 
 CLASE 2
 
-[Clase 2](clase1/CLASE2.md)
+[Clase 2](clase2/CLASE2.md)
 
 CLASE 3
 
-[Clase 3](clase1/CLASE3.md)
+[Clase 3](clase3/CLASE3.md)
 
 CLASE 4
 
-[Clase 4](clase1/CLASE4.md)
+[Clase 4](clase4/CLASE4.md)
 
 
 
