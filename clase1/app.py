@@ -1,5 +1,6 @@
 from flask import Flask,request
 import sys
+
 app = Flask(__name__)
 
 
@@ -50,20 +51,14 @@ def saludo(nombre):
 @app.route("/estudiantes")
 def obtener_estudiantes():
   print('Hello world!')  
-  lista_estudiantes=[estudiantes_db[key] for key in estudiantes_db.keys()]
-  return f"Loss estudiantes de este curso son {lista_estudiantes}"
+  lista_estudiantes=[f"{estudiantes_db[key]['nombre']} {estudiantes_db[key]['apellido']}" for key in estudiantes_db.keys()]
+  return f"Los estudiantes de este curso son {', '.join(lista_estudiantes)}"
 
 @app.route("/estudiantes/<int:id>")
 def obtener_estudiante(id):
   estudiante=estudiantes_db[str(id)]
   return f"Estudiante con cédula {id} se llama {estudiante['nombre']} {estudiante['apellido']} y es de la carrera {estudiante['carrera']} "
 
-@app.route("/estudiantes/<int:id>/notas")
-def notas(id):
-
-  notas_estudiante=estudiantes_db[str(id)]['notas']
-  notas_estudiante_str=", ".join(map(str, notas_estudiante))
-  return f"Las notas del (la) estudiante con ID {id} son {notas_estudiante_str}"
 
 
 if __name__ == '__main__':

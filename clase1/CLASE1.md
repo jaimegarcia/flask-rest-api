@@ -80,7 +80,7 @@ Hacemos click en Terminal y ejecutamos los siguientes comandos:
 
 ```bash
 py 3 -m venv .venv
-source .venv/bin/activate
+.\venv\Scripts\activate
 ```
 
 ![python-15](images/python-15.png)
@@ -132,6 +132,10 @@ En el archivo app.py importe Flask y cree una instancia de un objeto de Flask
 ```python
 from flask import Flask
 app = Flask(__name__)
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
 ```
 Adicione también en el archivo app.py, una función que retorne algun contenido, en este caso, un string; use, además, el decorador app.route para mapear la ruta del URL / a esa función:
 
@@ -205,60 +209,24 @@ def saludo(nombre):
   return f"Hola {titulo} {nombre}"
 ```
 
-En un navegador ingresamos la ruta incluyendo el parámetro
+En un navegador ingresamos la ruta incluyendo el parámetro, la respuesta que obtenemos 
 
-http://localhost:5000/saludo/jaime?titulo=Mr
-
-
-
-```python
-@app.route("/estudiantes/<int:id>/notas")
-def notas(id):
-  notas=[4,3,2,1,3]
-  return f"Las notas del (la) estudiante con ID {id} son {notas}"
+```
+http://localhost:5000/saludo/jaime?titulo=Sr
 ```
 
+
+Así queda el código con estas dos rutas:
+
 ```python
-@app.route("/estudiantes/<int:id>/notas")
-def notas(id):
-  notas={
-  "11234224":[4,3,2,1,2],
-  "12434236":[5,3,5,5,5],
-  "61236224":[1,3,2,1,1],
-  "52433236":[3,3,3,3,3]
-  }
-  notas_estudiante=notas[str(id)]
-  return f"Las notas del (la) estudiante con ID {id} son {(notas_estudiante)}"
-```
-
-# Agregamos ruta
-
-
 from flask import Flask,request
+import sys
+
 app = Flask(__name__)
-
-estudiantesDB={
-"11234224":{
-  "nombre":"Juana Correa",
-  "notas":[4,3,2,1,2]
-},
-"12434236":{
-  "nombre":"Jaime García",
-  "notas":[5,3,5,5,5]
-},
-"61236224":{
-  "nombre":"Roberta Mejía",
-  "notas":[1,3,2,1,1]
-},
-"52433236":{
-  "nombre":"Miriam Zapata",
-  "notas":[3,3,3,3,3]
-}
-}
-
 
 @app.route("/")
 def hola_mundo():
+  print("holas")
   return "Adiós, Mundo!"
 
 
@@ -267,40 +235,132 @@ def saludo(nombre):
   titulo = request.args.get('titulo', '')
   return f"Hola {titulo} {nombre}"
 
+if __name__ == '__main__':
+    app.run(debug=True)
+```
 
-@app.route("/estudiantes/<int:id>")
-def estudiantes(id):
-  print("estudiante",estudiantesDB[str(id)])
-  nombre_estudiante=estudiantesDB[str(id)]['nombre']
-  return f"La estudiante con ID {id} se llama {nombre_estudiante}"
-
-@app.route("/estudiantes/<int:id>/notas")
-def notas(id):
-
-  notas_estudiante=estudiantesDB[str(id)]['notas']
-  return f"Las notas del (la) estudiante con ID {id} son {(notas_estudiante)}"
+Ejercicio: Agreguen una nueva ruta que se llame despedida, deb recibir como parte la ruta un string el nombre de la persona y como parámetro la frase de despedida (Chao, Adiós, Sayonara). Es decir que si se ingresa a la ruta /despedida/jaime?tipo=Sayonara la respuesta que debemos obtener es Sayonara jaime
 
 
-# Agregamos formato
-@app.route("/estudiantes/<int:id>/notas")
-def notas(id):
+### Instalación de Postman y/o Rest Client
 
-  notas_estudiante=estudiantesDB[str(id)]['notas']
-  notas_estudiante_str=", ".join(map(str, notas_estudiante))
-  return f"Las notas del (la) estudiante con ID {id} son {notas_estudiante_str}"
+Vamos a utilizar un Cliente para conectarnos con las APIs que se van a crear. Se recomienda utilizar Postman y/o la extensión Rest Client de VSCode
 
 
-# Agregamos una consulta
+Para instalar Postman
+
+Vamos a crear una base de datos en un diccionario local
+```python
+estudiantes_db={
+  "11234224":{
+    "cedula":11234224,
+    "nombre":"Juana",
+    "apellido":"Correa",
+    "correo":"juana.correa@misena.edu.co",
+    "carrera":"Electrónica"
+  },
+  "12434236":{
+    "cedula":12434236,
+    "nombre":"Jaime",
+    "apellido":"García",
+    "correo":"jaime.garcia@misena.edu.co",
+    "carrera":"Administración"
+  },
+  "61236224":{
+    "cedula":61236224,
+    "nombre":"Roberta",
+    "apellido":"Mejia",
+    "correo":"roberta.mejia@misena.edu.co",
+    "carrera":"Sistemas"
+  },
+  "52433236":{
+    "cedula":52433236,
+    "nombre":"Miriam",
+    "apellido":"Zapata",
+    "correo":"miriam.zapata@misena.edu.co",
+    "carrera":"Sistemas"
+  }
+}
+```
+
+Agregamos un Endpoint para obtener los datos de uno de los estudiantes:
 
 
-@app.route("/estudiantes")
-def estudiantes_lista():
-  lista_estudiantes=[]
-  for estudiante in estudiantesDB.keys():
-    lista_estudiantes.append(estudiantesDB[estudiante]["nombre"])
+```python
+@app.route("/api/estudiantes/<int:id>")
+def obtener_estudiante(id):
+  estudiante=estudiantes_db[str(id)]
+  return f"Estudiante con cédula {id} se llama {estudiante['nombre']} {estudiante['apellido']} y es de la carrera {estudiante['carrera']} "
+```
 
-  return f"Los estudiantes de este curso son {lista_estudiantes}"
+Ahora creamos otra ruta para obtener la lista completa de estudiantes:
 
+```python
+@app.route("/api/estudiantes")
+def obtener_estudiantes():
+  print('Hello world!')  
+  lista_estudiantes=[f"{estudiantes_db[key]['nombre']} {estudiantes_db[key]['apellido']}" for key in estudiantes_db.keys()]
+  return f"Los estudiantes de este curso son {', '.join(lista_estudiantes)}"
+```
+
+El código que llevamos hasta el momento, es el siguiente:
+
+```python
+from flask import Flask,request
+import sys
+
+app = Flask(__name__)
+
+
+estudiantes_db={
+  "11234224":{
+    "cedula":11234224,
+    "nombre":"Juana",
+    "apellido":"Correa",
+    "correo":"juana.correa@misena.edu.co",
+    "carrera":"Electrónica"
+  },
+  "12434236":{
+    "cedula":12434236,
+    "nombre":"Jaime",
+    "apellido":"García",
+    "correo":"jaime.garcia@misena.edu.co",
+    "carrera":"Administración"
+  },
+  "61236224":{
+    "cedula":61236224,
+    "nombre":"Roberta",
+    "apellido":"Mejia",
+    "correo":"roberta.mejia@misena.edu.co",
+    "carrera":"Sistemas"
+  },
+  "52433236":{
+    "cedula":52433236,
+    "nombre":"Miriam",
+    "apellido":"Zapata",
+    "correo":"miriam.zapata@misena.edu.co",
+    "carrera":"Sistemas"
+  }
+}
+
+@app.route("/api/estudiantes")
+def obtener_estudiantes():
+  print('Hello world!')  
+  lista_estudiantes=[f"{estudiantes_db[key]['nombre']} {estudiantes_db[key]['apellido']}" for key in estudiantes_db.keys()]
+  return f"Los estudiantes de este curso son {', '.join(lista_estudiantes)}"
+
+@app.route("/api/estudiantes/<int:id>")
+def obtener_estudiante(id):
+  estudiante=estudiantes_db[str(id)]
+  return f"Estudiante con cédula {id} se llama {estudiante['nombre']} {estudiante['apellido']} y es de la carrera {estudiante['carrera']} "
+
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
+```
+
+Acabamos de construir nuestro primer REST API 🥳 
 
 REST
 
@@ -313,50 +373,50 @@ REpresentational State Transfer*
 
 
 Use pronombres en plural para indicar los recursos asociados
-
+```
 estudiantes
+```
 
+El identificador a la derecha del recurso indica que se va a realizar operaciones con el Estudiante con ID 1324345
 
+```
 estudiantes/1324345
+```
 
-El identificador a la derecha del recurso indica que se va a realizar operaciones con el Estudiante con ID  1324345
+Si el recurso tiene asociado otro recurso, esto se puede indicar en el Endpoint de la siguiente forma:
 
-estudiantes/1324345/tareas
+```
+estudiantes/1324345/peticiones
+```
 
-Si el recurso tiene asociado
+Esto indica que devuelva todas las peticiones del estudiante con ID 1324345
 
-/v1/estudiantes/1324345/tareas/12
+También se puede pedir un recurso específico asociado a otro recurso. Por ejemplo, en la siguiente ruta se estaría pidiendo la petición con ID 12 del estudiante con ID 1324345
 
-Utilice los query strings para propiedades no asociadas a los recurso
+```
+estudiantes/1324345/peticiones/12
+```
 
+Utilice los query strings para propiedades no asociadas a los recurso. Por ejemplo
+
+```
 /estudiantes?ordenar=nombre
 /estudiantes?pagina=1
 /estudiantes?formato=json
+```
+
+Tipos de Parámetros que acepta Flask
+
+| Tipo  | Descripción |
+| ------------- | ------------- |
+| string  | Acepta cualquier texto sin slash (definido por defecto). |
+| int  | Admite un entero positivo |
+| path  | Similar a un string, pero se adimiten slashes |
+| uuid  | Admite strings UUID (Identificadores únicos) |
 
 
-string
+El verbo que acabamoos de utilizar es el GET, existen otros verbos en el Protocolo HTTP, debemos usarlos siempre que sea posible
 
-(default) accepts any text without a slash
-
-int
-
-accepts positive integers
-
-float
-
-accepts positive floating point values
-
-path
-
-like string but also accepts slashes
-
-uuid
-
-accepts UUID strings
-
-
-
-Utilice los verbos de HTTP siempre que sea posible
 
 GET
 - Obtiene un recurso
@@ -369,8 +429,9 @@ PATCH
 DELETE
 - Borra un recurso existente
 
+Si es necesario se puede utilizar otros verbos, 
 
-POST /estudiantes/1324345/tareas/12/aprobar
+POST /estudiantes/1324345/peticiones/12/aprobar
 
 
 | Recurso  | GET | POST | PUT | DELETE |
@@ -383,6 +444,11 @@ Idempotencia: Operación que puede ser aplica múltiples veces, sin cambiar el r
 
 - GET, PUT, PATCH y DELETE: Idempotentes
 - POST no es idempotente
+
+
+
+
+
 
 
 Diseñando resultados
