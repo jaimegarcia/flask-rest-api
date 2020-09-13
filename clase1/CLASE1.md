@@ -166,7 +166,7 @@ El servidor busca la aplicacción app.py por defecto. Al correr Flask, verá una
 
 Abrimos en un navegador la ruta localhost:5000, y debemos ver el mensaje Hola, Mundo!
 
-Cambiemos algo del codigo
+Cambiemos algo del código
 
 ```python
 from flask import Flask
@@ -178,7 +178,9 @@ def hola_mundo():
   return "Adios, Mundo!"
 ```
 
-Agreguemos una nueva ruta pero con un parametro
+Se actualizará automáticamente, y si ingresamos de nuevo a la ruta, veremos el nuevo mensaje.
+
+Agreguemos una nueva ruta pero con un parametro. La f indica un string con formato, el nombre es reemplazado por el parámetro que recibe la función
 
 ```python
 @app.route("/saludo/<nombre>")
@@ -186,11 +188,15 @@ def saludo(nombre):
   return f"Hola {nombre}"
 ```
 
+Podemos indicar el tipo de dato que va a recibir la ruta de la siguiente forma
+
 ```python
 @app.route("/saludo/<string:nombre>")
 def saludo(nombre):
   return f"Hola {nombre}"
 ```
+
+Agregemos un parámetro dentro de la query de la ruta: titulo
 
 ```python
 @app.route("/saludo/<string:nombre>")
@@ -199,7 +205,11 @@ def saludo(nombre):
   return f"Hola {titulo} {nombre}"
 ```
 
+En un navegador ingresamos la ruta incluyendo el parámetro
+
 http://localhost:5000/saludo/jaime?titulo=Mr
+
+
 
 ```python
 @app.route("/estudiantes/<int:id>/notas")
