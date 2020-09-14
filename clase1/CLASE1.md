@@ -247,12 +247,19 @@ if __name__ == '__main__':
 Ejercicio: Agreguen una nueva ruta que se llame despedida, deb recibir como parte la ruta un string el nombre de la persona y como parámetro la frase de despedida (Chao, Adiós, Sayonara). Es decir que si se ingresa a la ruta /despedida/jaime?tipo=Sayonara la respuesta que debemos obtener es Sayonara jaime
 
 
-### Instalación de Postman y/o Rest Client
+### Instalación de Rest Client o Postman
 
-Vamos a utilizar un Cliente para conectarnos con las APIs que se van a crear. Se recomienda utilizar Postman y/o la extensión Rest Client de VSCode
+Vamos a utilizar un Cliente para conectarnos con las APIs que se van a crear. Se recomienda la extensión Rest Client de VSCode. 
+
+Para instalar Rest Client, vaya a extensiones en VSCode busque Rest Client, haga click en Instalar y Recargue VSCode
+
+![rest-client](images/rest-client.png)
 
 
-Para instalar Postman
+También puede utilizar Postman. Para instalar Postman, ingrese a https://www.postman.com/, registrese y descargué el producto
+
+
+### Desarrollo de REST API
 
 Vamos a crear una base de datos en un diccionario local
 ```python
@@ -727,7 +734,7 @@ Status Code: 400
 {
     "error":"Los datos del estudiante no están completos o son incorrectos"
 }
-
+```
 
 ```python
 @app.route("/estudiantes",methods=['GET'])
@@ -770,4 +777,93 @@ def agregar_estudiante():
       return jsonify(error_message),400
 ```
 
+
+Este es el código completo que llevamos hasta el momento:
+```python
+from flask import Flask,request,jsonify,abort
+import sys
+
+app = Flask(__name__)
+
+
+estudiantes_db={
+  "11234224":{
+    "cedula":11234224,
+    "nombre":"Juana",
+    "apellido":"Correa",
+    "correo":"juana.correa@misena.edu.co",
+    "carrera":"Electrónica"
+  },
+  "12434236":{
+    "cedula":12434236,
+    "nombre":"Jaime",
+    "apellido":"García",
+    "correo":"jaime.garcia@misena.edu.co",
+    "carrera":"Administración"
+  },
+  "61236224":{
+    "cedula":61236224,
+    "nombre":"Roberta",
+    "apellido":"Mejia",
+    "correo":"roberta.mejia@misena.edu.co",
+    "carrera":"Sistemas"
+  },
+  "52433236":{
+    "cedula":52433236,
+    "nombre":"Miriam",
+    "apellido":"Zapata",
+    "correo":"miriam.zapata@misena.edu.co",
+    "carrera":"Sistemas"
+  }
+}
+
+
+@app.route("/")
+def hola_mundo():
+  print("holas")
+  return "Adiós, Mundo!"
+
+
+@app.route("/saludo/<string:nombre>")
+def saludo(nombre):
+  titulo = request.args.get('titulo', '')
+  return f"Hola {titulo} {nombre}"
+
+
+@app.route("/estudiantes",methods=['GET'])
+def obtener_estudiantes():
+    lista_estudiantes=[estudiantes_db[key] for key in estudiantes_db.keys()]
+    return jsonify({"data":lista_estudiantes}),200
+
+@app.route("/estudiantes/<int:id>",methods=['GET'])
+def obtener_estudiante(id):
+    try:
+      estudiante=estudiantes_db[str(id)]
+      return jsonify(estudiante),200
+    except:
+      error_message={"error":f"No se encontró ningún estudiante con el ID {id}"}
+      return jsonify(error_message),400
+
+
+@app.route("/estudiantes",methods=['POST'])
+def agregar_estudiante():
+
+  estudiante_id=str(request.json["cedula"])
+  if(estudiante_id in estudiantes_db):
+    error_message={"error":f"Ya existe un estudiante registrando con el ID {estudiante_id}"}
+    return jsonify(error_message),400
+    
+  try:  
+    nuevo_estudiante=dict()
+    nuevo_estudiante["cedula"]=request.json["cedula"]
+    nuevo_estudiante["nombre"]=request.json["nombre"]
+    nuevo_estudiante["apellido"]=request.json["apellido"]
+    nuevo_estudiante["carrera"]=request.json["carrera"]
+    nuevo_estudiante["correo"]=request.json["correo"]
+    estudiantes_db[estudiante_id]=nuevo_estudiante
+    return jsonify(nuevo_estudiante),201
+  except:
+      error_message={"error":"Los datos del estudiante no están completos o son incorrectos"}
+      return jsonify(error_message),400
+```
 Ejercicio: Programe las respuestas para los verbos PUT y DELETE

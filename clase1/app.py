@@ -86,17 +86,35 @@ def agregar_estudiante():
 
 @app.route("/estudiantes/<int:id>",methods=['PUT'])
 def actualizar_estudiante(id):
+
+  try:
     estudiante_id=str(id)
-    estudiantes_db[estudiante_id]=request.json
-    print(estudiantes_db)
-    return f"Estudiante con ID {estudiante_id} actualizado"
+    estudiante=estudiantes_db[estudiante_id]
+  except:
+    error_message={"error":f"No se encontró ningún estudiante con el ID {id}"}
+    return jsonify(error_message),400
+  try:
+    estudiante["cedula"]=request.json["cedula"]
+    estudiante["nombre"]=request.json["nombre"]
+    estudiante["apellido"]=request.json["apellido"]
+    estudiante["carrera"]=request.json["carrera"]
+    estudiante["correo"]=request.json["correo"]
+    estudiantes_db[estudiante_id]=estudiante
+    return jsonify(estudiante),200
+  except:
+    error_message={"error":"Los datos del estudiante no están completos o son incorrectos"}
+    return jsonify(error_message),400
 
 @app.route("/estudiantes/<int:id>",methods=['DELETE'])
 def eliminar_estudiante(id):
+  try:
     estudiante_id=str(id)
     del estudiantes_db[estudiante_id]
-    print(estudiantes_db)
-    return f"Estudiante con ID {estudiante_id} eliminado"
+    result={"cedula":id,"borrado":True}
+    return jsonify(result),200
+  except:
+    error_message={"error":f"No se encontró ningún estudiante con el ID {id}"}
+    return jsonify(error_message),400
 
 if __name__ == '__main__':
     app.run(debug=True)
