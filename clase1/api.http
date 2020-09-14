@@ -7,16 +7,16 @@ GET http://localhost:5000/
 GET http://localhost:5000/saludo/jaime?titulo=Sr
 
 ### Listar todos los estudiantes
-GET http://localhost:5000/estudiantes
+GET http://localhost:5000/api/estudiantes
 
 
 
 ### Obtener información de estudiante
-GET http://localhost:5000/estudiantes/{{cedula}}
+GET http://localhost:5000/api/estudiantes/{{cedula}}
 
 
 ### Agregar nuevo estudiante
-POST http://localhost:5000/estudiantes
+POST http://localhost:5000/api/estudiantes
 Content-Type: application/json
 
 {
@@ -28,7 +28,7 @@ Content-Type: application/json
 }
 
 ### Actualizar estudiante
-PUT http://localhost:5000/estudiantes/{{cedula2}}
+PUT http://localhost:5000/api/estudiantes/{{cedula2}}
 Content-Type: application/json
 
 {
@@ -41,5 +41,5 @@ Content-Type: application/json
 
 
 ### Eliminar estudiante
-DELETE http://localhost:5000/estudiantes/{{cedula2}}
+DELETE http://localhost:5000/api/estudiantes/{{cedula2}}
 

@@ -48,12 +48,12 @@ def saludo(nombre):
   return f"Hola {titulo} {nombre}"
 
 
-@app.route("/estudiantes",methods=['GET'])
+@app.route("/api/estudiantes",methods=['GET'])
 def obtener_estudiantes():
     lista_estudiantes=[estudiantes_db[key] for key in estudiantes_db.keys()]
     return jsonify({"data":lista_estudiantes}),200
 
-@app.route("/estudiantes/<int:id>",methods=['GET'])
+@app.route("/api/estudiantes/<int:id>",methods=['GET'])
 def obtener_estudiante(id):
     try:
       estudiante=estudiantes_db[str(id)]
@@ -63,7 +63,7 @@ def obtener_estudiante(id):
       return jsonify(error_message),400
 
 
-@app.route("/estudiantes",methods=['POST'])
+@app.route("/api/estudiantes",methods=['POST'])
 def agregar_estudiante():
 
   estudiante_id=str(request.json["cedula"])
@@ -84,7 +84,7 @@ def agregar_estudiante():
       error_message={"error":"Los datos del estudiante no están completos o son incorrectos"}
       return jsonify(error_message),400
 
-@app.route("/estudiantes/<int:id>",methods=['PUT'])
+@app.route("/api/estudiantes/<int:id>",methods=['PUT'])
 def actualizar_estudiante(id):
 
   try:
@@ -105,7 +105,7 @@ def actualizar_estudiante(id):
     error_message={"error":"Los datos del estudiante no están completos o son incorrectos"}
     return jsonify(error_message),400
 
-@app.route("/estudiantes/<int:id>",methods=['DELETE'])
+@app.route("/api/estudiantes/<int:id>",methods=['DELETE'])
 def eliminar_estudiante(id):
   try:
     estudiante_id=str(id)

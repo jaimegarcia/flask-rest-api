@@ -1,4 +1,3 @@
-import os
 from flask import Flask, request, jsonify
 from firebase_admin import credentials, firestore, initialize_app
 import pytz
@@ -19,13 +18,33 @@ peticiones_ref = db.collection('Peticiones')
 
 
 nuevo_estudiante=Estudiante(122345, "Jaime", "Garcia", "jaime.garcia", "Electronica")
-print(nuevo_estudiante)
+print(nuevo_estudiante.to_dict())
 
 nueva_fecha_creacion=timezone.localize(datetime.now())
 nueva_fecha_atencion=timezone.localize(datetime.strptime('25/09/20 7:00:00', '%d/%m/%y %H:%M:%S'))
 
 nueva_peticion=Peticion(122345, "Asesoria",nueva_fecha_creacion,nueva_fecha_atencion)
-print(nueva_peticion,nueva_peticion.fecha_creacion,nueva_peticion.fecha_atencion)
+print(nueva_peticion.to_dict(),nueva_peticion.fecha_creacion,nueva_peticion.fecha_atencion)
+
+
+
+
+@app.route("/api/estudiantes",methods=['POST'])
+def agregar_estudiante():
+
+    data=request.json
+    estudiante_id=str(request.json["cedula"])
+    '''if(estudiante_id in estudiantes_db):
+        error_message={"error":f"Ya existe un estudiante registrando con el ID {estudiante_id}"}
+        return jsonify(error_message),400'''
+
+    try:  
+        nuevo_estudiante=Estudiante(data["cedula"], data["nombre"], data["apellido"],data["correo"], data["carrera"]).to_dict()
+        estudiantes_ref.document(estudiante_id).set(nuevo_estudiante)
+        return jsonify(nuevo_estudiante),201
+    except:
+        error_message={"error":"Los datos del estudiante no están completos o son incorrectos"}
+        return jsonify(error_message),400
 
 @app.route('/add', methods=['POST'])
 def create():

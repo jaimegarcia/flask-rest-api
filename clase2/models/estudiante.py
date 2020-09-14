@@ -5,3 +5,6 @@ class Estudiante:
         self.apellido = apellido
         self.correo = correo
         self.carrera = carrera
+
+    def to_dict(self):
+        return dict((key, value) for (key, value) in self.__dict__.items())

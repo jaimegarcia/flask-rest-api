@@ -1,35 +1,45 @@
+@cedula=11234224
+@cedula2=2354659
+### Hola Mundo
+GET http://localhost:5000/
+
+### Saludo
+GET http://localhost:5000/saludo/jaime?titulo=Sr
+
+### Listar todos los estudiantes
+GET http://localhost:5000/api/estudiantes
 
 
 
-###
-GET http://localhost:5000/estudiantes
+### Obtener información de estudiante
+GET http://localhost:5000/api/estudiantes/{{cedula}}
 
 
-
-###
-POST http://localhost:5000/add
+### Agregar nuevo estudiante
+POST http://localhost:5000/api/estudiantes
 Content-Type: application/json
 
-{"id":"15","nombre":"Jorge Hernandez","notas":[4,5,6,7,8]}
+{
+  "cedula":2354659,
+  "nombre":"Julian",
+  "apellido":"Parras",
+  "correo":"julian.parra@misena.edu.co",
+  "carrera":"Industrial"
+}
 
-
-###
-GET http://localhost:5000/list
-
-###
-POST http://localhost:5000/update/15
+### Actualizar estudiante
+PUT http://localhost:5000/api/estudiantes/{{cedula2}}
 Content-Type: application/json
 
-{"nombre":"Roberto"}
-### Agenda Estudiante Reserva un esppacio de asesoria, tema
-# Estudiante
-# Centro
-# Asunto
-# Equipo
-# Tiempo
-# Fecha
-# Tareas
-# Lista de tareas por hacer
-# Inserta Tarea
-# Actualizar Tarea (Estado, Fecha)
-# Borrar Tarea
+{
+    "cedula":2354656,
+    "nombre":"Julian",
+    "apellido":"Parras",
+    "correo":"julian.parras@misena.edu.co",
+    "carrera":"Electrónica"
+}
+
+
+### Eliminar estudiante
+DELETE http://localhost:5000/api/estudiantes/{{cedula2}}
+

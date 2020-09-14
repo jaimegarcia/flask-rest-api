@@ -51,7 +51,6 @@ pip3 install -r requirements.txt
 
 Inclumos el siguiente código para conectarnos con Cloud FireStore y generar referencias a las Colecciones Estudiantes y Peticiones
 ```python
-import os
 from flask import Flask, request, jsonify
 from firebase_admin import credentials, firestore, initialize_app
 
@@ -80,6 +79,9 @@ class Estudiante:
         self.apellido = apellido
         self.correo = correo
         self.carrera = carrera
+
+    def to_dict(self):
+        return dict((key, value) for (key, value) in self.__dict__.items())
 ```
 
 Ejercicio: Cree el modelo de Peticion en el archivo peticion.py dentro de la carpeta models, debe tener los siguiente campos: cedula, peticion, fecha_creacion, fecha_atencion
@@ -95,7 +97,6 @@ from .peticion import Peticion
 Importamos los modelos en el app.py
 
 ```python
-import os
 from flask import Flask, request, jsonify
 from firebase_admin import credentials, firestore, initialize_app
 
@@ -105,7 +106,7 @@ from models import Estudiante,Peticion
 Probemos crear una instancia de cada modelo para verificar que quedo bien
 ```python
 nuevo_estudiante=Estudiante(122345, "Jaime", "Garcia", "jaime.garcia", "Electronica")
-print(nuevo_estudiante)
+print(nuevo_estudiante.to_dict())
 ```
 
 
@@ -123,13 +124,12 @@ nueva_fecha_creacion=timezone.localize(datetime.now())
 nueva_fecha_atencion=timezone.localize(datetime.strptime('25/09/20 7:00:00', '%d/%m/%y %H:%M:%S'))
 
 nueva_peticion=Peticion(122345, "Asesoria",nueva_fecha_creacion,nueva_fecha_atencion)
-print(nueva_peticion,nueva_peticion.fecha_creacion,nueva_peticion.fecha_atencion)
+print(nueva_peticion.to_dict(),nueva_peticion.fecha_creacion,nueva_peticion.fecha_atencion)
 ```
 
 El código completo que llevamos hasta el momento es el siguiente:
 ```python
 
-import os
 from flask import Flask, request, jsonify
 from firebase_admin import credentials, firestore, initialize_app
 import pytz
@@ -150,17 +150,42 @@ peticiones_ref = db.collection('Peticiones')
 
 
 nuevo_estudiante=Estudiante(122345, "Jaime", "Garcia", "jaime.garcia", "Electronica")
-print(nuevo_estudiante)
+print(nuevo_estudiante.to_dict())
 
 nueva_fecha_creacion=timezone.localize(datetime.now())
 nueva_fecha_atencion=timezone.localize(datetime.strptime('25/09/20 7:00:00', '%d/%m/%y %H:%M:%S'))
 
 nueva_peticion=Peticion(122345, "Asesoria",nueva_fecha_creacion,nueva_fecha_atencion)
-print(nueva_peticion,nueva_peticion.fecha_creacion,nueva_peticion.fecha_atencion)
+print(nueva_peticion.to_dict(),nueva_peticion.fecha_creacion,nueva_peticion.fecha_atencion)
 
 if __name__ == '__main__':
     app.run(debug=True)
 ```
+
+
+Vamos a agregar la primera ruta: POST para Agregar nuevos estudiantes
+
+@app.route("/estudiantes",methods=['POST'])
+def agregar_estudiante():
+
+  estudiante_id=str(request.json["cedula"])
+  if(estudiante_id in estudiantes_db):
+    error_message={"error":f"Ya existe un estudiante registrando con el ID {estudiante_id}"}
+    return jsonify(error_message),400
+    
+  try:  
+    nuevo_estudiante=dict()
+    nuevo_estudiante["cedula"]=request.json["cedula"]
+    nuevo_estudiante["nombre"]=request.json["nombre"]
+    nuevo_estudiante["apellido"]=request.json["apellido"]
+    nuevo_estudiante["carrera"]=request.json["carrera"]
+    nuevo_estudiante["correo"]=request.json["correo"]
+    estudiantes_db[estudiante_id]=nuevo_estudiante
+    return jsonify(nuevo_estudiante),201
+  except:
+      error_message={"error":"Los datos del estudiante no están completos o son incorrectos"}
+      return jsonify(error_message),400
+
 
 Request
 
