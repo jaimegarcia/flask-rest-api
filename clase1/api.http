@@ -1,4 +1,5 @@
-
+@cedula=11234224
+@cedula2=2354656
 ### Hola Mundo
 GET http://localhost:5000/
 
@@ -9,11 +10,9 @@ GET http://localhost:5000/saludo/jaime?titulo=Sr
 GET http://localhost:5000/estudiantes
 
 
-@cedula=11234224
+
 ### Obtener información de estudiante
 GET http://localhost:5000/estudiantes/{{cedula}}
-
-
 
 
 ### Agregar nuevo estudiante
@@ -21,11 +20,26 @@ POST http://localhost:5000/estudiantes
 Content-Type: application/json
 
 {
+  "cedula":2354656,
+  "nombre":"Julian",
+  "apellido":"Parra",
+  "correo":"julian.parra@misena.edu.co",
+  "carrera":"Industrial"
+}
+
+### Actualizar estudiante
+PUT http://localhost:5000/estudiantes/{{cedula2}}
+Content-Type: application/json
+
+{
     "cedula":2354656,
     "nombre":"Julian",
-    "apellido":"Parra",
-    "correo":"julian.parra@misena.edu.co",
-    "carrera":"Industrial"
-  }
+    "apellido":"Parras",
+    "correo":"julian.parras@misena.edu.co",
+    "carrera":"Electrónica"
+}
 
+
+### Eliminar estudiante
+DELETE http://localhost:5000/estudiantes/{{cedula2}}
 

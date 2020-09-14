@@ -454,20 +454,61 @@ Idempotencia: Operación que puede ser aplica múltiples veces, sin cambiar el r
 
 
 
-Agreguemos el verbo POST para agregar un nuevo estudiante:
+Generemos una ruta con el verbo POST para agregar un nuevo estudiante:
 
 ```python
-@app.route("/estudiantes",methods=['GET', 'POST'])
-def obtener_estudiantes():
-  if request.method == 'GET':
-    lista_estudiantes=[f"{estudiantes_db[key]['nombre']} {estudiantes_db[key]['apellido']}" for key in estudiantes_db.keys()]
-    return f"Los estudiantes de este curso son {', '.join(lista_estudiantes)}"
-  else:
-    nuevo_estudiante_id=request.json["cedula"]
-    estudiantes_db[str(nuevo_estudiante_id)]=request.json
-    return f"Estudiante con ID {nuevo_estudiante_id} agregado"
+@app.route("/estudiantes",methods=['POST'])
+def agregar_estudiante():
+    estudiante_id=str(request.json["cedula"])
+    estudiantes_db[estudiante_id]=request.json
+    return f"Estudiante con ID {estudiante_id} agregado"
 ```
 
+Si hacemos el POST con Postman o Rest Client, agregamos un nuevo estudiante
+```python
+### Agregar nuevo estudiante
+POST http://localhost:5000/estudiantes
+Content-Type: application/json
+
+{
+  "cedula":2354656,
+  "nombre":"Julian",
+  "apellido":"Parra",
+  "correo":"julian.parra@misena.edu.co",
+  "carrera":"Industrial"
+}
+```
+
+Ejercicio: Complete el código para las rutas con verbos PUT (actualizar toda la información del estudiante a partir de la cédula) y DELETE (eliminar el estudiante a partir de la cédula). Recuerde la función del para borrar atributos de un diccionario
+
+```python
+@app.route("/estudiantes/<int:id>",methods=['PUT'])
+def actualizar_estudiante(id):
+
+@app.route("/estudiantes/<int:id>",methods=['DELETE'])
+def eliminar_estudiante(id):
+```
+
+Estas serían las consultas de Actualización y borrado
+
+```python
+@cedula2=2354656
+### Actualizar estudiante
+PUT http://localhost:5000/estudiantes/{{cedula2}}
+Content-Type: application/json
+
+{
+    "cedula":2354656,
+    "nombre":"Julian",
+    "apellido":"Parras",
+    "correo":"julian.parras@misena.edu.co",
+    "carrera":"Electrónica"
+}
+
+
+### Eliminar estudiante
+DELETE http://localhost:5000/estudiantes/{{cedula2}}
+```
 
 Diseñando resultados
 

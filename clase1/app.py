@@ -48,22 +48,36 @@ def saludo(nombre):
   return f"Hola {titulo} {nombre}"
 
 
-@app.route("/estudiantes",methods=['GET', 'POST'])
+@app.route("/estudiantes",methods=['GET'])
 def obtener_estudiantes():
-  if request.method == 'GET':
     lista_estudiantes=[f"{estudiantes_db[key]['nombre']} {estudiantes_db[key]['apellido']}" for key in estudiantes_db.keys()]
     return f"Los estudiantes de este curso son {', '.join(lista_estudiantes)}"
-  else:
-    nuevo_estudiante_id=request.json["cedula"]
-    estudiantes_db[str(nuevo_estudiante_id)]=request.json
-    return f"Estudiante con ID {nuevo_estudiante_id} agregado"
 
-@app.route("/estudiantes/<int:id>")
+@app.route("/estudiantes/<int:id>",methods=['GET'])
 def obtener_estudiante(id):
-  estudiante=estudiantes_db[str(id)]
-  return f"Estudiante con cédula {id} se llama {estudiante['nombre']} {estudiante['apellido']} y es de la carrera {estudiante['carrera']} "
+    estudiante=estudiantes_db[str(id)]
+    return f"Estudiante con cédula {id} se llama {estudiante['nombre']} {estudiante['apellido']} y es de la carrera {estudiante['carrera']} "
 
 
+@app.route("/estudiantes",methods=['POST'])
+def agregar_estudiante():
+    estudiante_id=str(request.json["cedula"])
+    estudiantes_db[estudiante_id]=request.json
+    return f"Estudiante con ID {estudiante_id} agregado"
+
+@app.route("/estudiantes/<int:id>",methods=['PUT'])
+def actualizar_estudiante(id):
+    estudiante_id=str(id)
+    estudiantes_db[estudiante_id]=request.json
+    print(estudiantes_db)
+    return f"Estudiante con ID {estudiante_id} actualizado"
+
+@app.route("/estudiantes/<int:id>",methods=['DELETE'])
+def eliminar_estudiante(id):
+    estudiante_id=str(id)
+    del estudiantes_db[estudiante_id]
+    print(estudiantes_db)
+    return f"Estudiante con ID {estudiante_id} eliminado"
 
 if __name__ == '__main__':
     app.run(debug=True)
