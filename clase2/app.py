@@ -1,18 +1,31 @@
-# app.py
-
-# Required imports
 import os
 from flask import Flask, request, jsonify
 from firebase_admin import credentials, firestore, initialize_app
+import pytz
+from datetime import datetime
 
-# Initialize Flask app
+timezone = pytz.timezone("America/Bogota")
+
+from models import Estudiante,Peticion
+
 app = Flask(__name__)
-print("app2")
-# Initialize Firestore DB
+
+# Inicializar Firestore DB
 cred = credentials.Certificate('key/key.json')
 default_app = initialize_app(cred)
 db = firestore.client()
-estudiantes_ref = db.collection('estudiantes')
+estudiantes_ref = db.collection('Estudiantes')
+peticiones_ref = db.collection('Peticiones')
+
+
+nuevo_estudiante=Estudiante(122345, "Jaime", "Garcia", "jaime.garcia", "Electronica")
+print(nuevo_estudiante)
+
+nueva_fecha_creacion=timezone.localize(datetime.now())
+nueva_fecha_atencion=timezone.localize(datetime.strptime('25/09/20 7:00:00', '%d/%m/%y %H:%M:%S'))
+
+nueva_peticion=Peticion(122345, "Asesoria",nueva_fecha_creacion,nueva_fecha_atencion)
+print(nueva_peticion,nueva_peticion.fecha_creacion,nueva_peticion.fecha_atencion)
 
 @app.route('/add', methods=['POST'])
 def create():
@@ -62,3 +75,7 @@ def update(id):
         return jsonify({"success": True}), 200
     except Exception as e:
         return f"An Error Occured: {e}"
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
