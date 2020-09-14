@@ -20,7 +20,7 @@ POST http://localhost:5000/estudiantes
 Content-Type: application/json
 
 {
-  "cedula":2354656,
+  "cedula":2354659,
   "nombre":"Julian",
   "apellido":"Parra",
   "correo":"julian.parra@misena.edu.co",

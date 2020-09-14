@@ -200,7 +200,12 @@ def saludo(nombre):
   return f"Hola {nombre}"
 ```
 
-Agregemos un parámetro dentro de la query de la ruta: titulo
+Agregemos un parámetro dentro de la query de la ruta: titulo.
+
+Primero debemos importar request de Flask
+```python
+from flask import Flask,request
+```
 
 ```python
 @app.route("/saludo/<string:nombre>")
@@ -510,10 +515,259 @@ Content-Type: application/json
 DELETE http://localhost:5000/estudiantes/{{cedula2}}
 ```
 
-Diseñando resultados
+#### Diseño de Repuestas
+
+- Use los códigos de respuesta adecuados
+- Sea consistente (snake_case, camelCase, spinal-case)
+- No expongan datos de servidor
+- No exponga datos privados
+- No exponga datos que puedan generar brechas de seguridad
 
 
-Sea consistente (snake_case, camelCase, spinal-case)
-No expongan datos de servidor
-No exponga datos privados
-No exponga datos que puedan generar brechas de seguridad
+Flask cubre varios de los errores. Intente ejecutar la siguiente petición:
+```
+DELETE http://localhost:5000/estudiantes
+```
+
+
+2xx: Peticiones correctas
+Esta clase de código de estado indica que la petición fue recibida correctamente, entendida y aceptada.
+
+200 OK
+Respuesta estándar para peticiones correctas.
+201 Createds
+La petición ha sido completada y ha resultado en la creación de un nuevo recurso.
+
+3xx: Redirecciones
+El cliente tiene que tomar una acción adicional para completar la petición.
+
+301 Moved Permanently
+Esta y todas las peticiones futuras deberían ser dirigidas a la URL dada.
+
+4xx: Errores del cliente
+
+El error 404 en Wikipedia
+La solicitud contiene sintaxis incorrecta o no puede procesarse.
+
+La intención de la clase de códigos de respuesta 4xx es para casos en los cuales el cliente parece haber errado la petición. Excepto cuando se responde a una petición HEAD, el servidor debe incluir una entidad que contenga una explicación a la situación de error, y si es una condición temporal o permanente. Estos códigos de estado son aplicables a cualquier método de solicitud (como GET o POST). Los agentes de usuario deben desplegar cualquier entidad al usuario. Estos son típicamente los códigos de respuesta de error más comúnmente encontrados.
+
+400 Bad Request
+El servidor no procesará la solicitud, porque no puede, o no debe, debido a algo que es percibido como un error del cliente (ej: solicitud malformada, sintaxis errónea, etc). La solicitud contiene sintaxis errónea y no debería repetirse.
+401 Unauthorized4​
+Similar al 403 Forbidden, pero específicamente para su uso cuando la autentificación es posible pero ha fallado o aún no ha sido provista. Vea autenticación HTTP básica y Digest access authentication.
+403 Forbidden
+La solicitud fue legal, pero el servidor rehúsa responderla dado que el cliente no tiene los privilegios para realizarla. En contraste a una respuesta 401 No autorizado, autenticarse previamente no va a cambiar la respuesta.
+404 Not Found
+Recurso no encontrado. Se utiliza cuando el servidor web no encuentra la página o recurso solicitado.
+
+5xx: Errores de servidor
+El servidor falló al completar una solicitud aparentemente válida.
+
+
+500 Internal Server Error
+Es un código comúnmente emitido por aplicaciones empotradas en servidores web, mismas que generan contenido dinámicamente, por ejemplo aplicaciones montadas en IIS o Tomcat, cuando se encuentran con situaciones de error ajenas a la naturaleza del servidor web.
+501 Not Implemented
+El servidor no soporta alguna funcionalidad necesaria para responder a la solicitud del navegador (como por ejemplo el método utilizado para la petición).2​
+502 Bad Gateway
+El servidor está actuando de proxy o gateway y ha recibido una respuesta inválida del otro servidor, por lo que no puede responder adecuadamente a la petición del navegador.2​
+503 Service Unavailable
+El servidor no puede responder a la petición del navegador porque está congestionado o está realizando tareas de mantenimiento.2​
+504 Gateway Timeout
+El servidor está actuando de proxy o gateway y no ha recibido a tiempo una respuesta del otro servidor, por lo que no puede responder adecuadamente a la petición del navegador
+509 Bandwidth Limit Exceeded
+Límite de ancho de banda excedido. Este código de estatus, a pesar de ser utilizado por muchos servidores, no es oficial.
+
+Vamos a incluir dos librerías más de Flask: Jsonify y Abort
+```python
+from flask import Flask,request,jsonify,abort
+```
+
+Respuesta a GET Obtener Todos los Estudiantes
+
+Status Code: 200
+```python
+{
+  "data": [
+    {
+      "apellido": "Correa",
+      "carrera": "Electr\u00f3nica",
+      "cedula": 11234224,
+      "correo": "juana.correa@misena.edu.co",
+      "nombre": "Juana"
+    },
+    {
+      "apellido": "Garc\u00eda",
+      "carrera": "Administraci\u00f3n",
+      "cedula": 12434236,
+      "correo": "jaime.garcia@misena.edu.co",
+      "nombre": "Jaime"
+    },
+    {
+      "apellido": "Mejia",
+      "carrera": "Sistemas",
+      "cedula": 61236224,
+      "correo": "roberta.mejia@misena.edu.co",
+      "nombre": "Roberta"
+    },
+    {
+      "apellido": "Zapata",
+      "carrera": "Sistemas",
+      "cedula": 52433236,
+      "correo": "miriam.zapata@misena.edu.co",
+      "nombre": "Miriam"
+    }
+  ]
+}
+```
+
+Respuestas a GET Obtener Estudiante
+
+ID Existe
+Status Code: 200
+```python
+{
+  "apellido": "Correa",
+  "carrera": "Electr\u00f3nica",
+  "cedula": 11234224,
+  "correo": "juana.correa@misena.edu.co",
+  "nombre": "Juana"
+}
+```
+
+ID No Existe
+Status Code: 400
+```python
+{
+    "error":"No se encontró ningún estudiante con el ID xxxx"
+}
+```
+
+Respuestas a POST Agregar Estudiante
+
+ID No Existe y la data está completa y correcta
+Status Code: 201
+```python
+{
+    "cedula":2354656,
+    "nombre":"Julian",
+    "apellido":"Parra",
+    "correo":"julian.parras@misena.edu.co",
+    "carrera":"Electrónica"
+}
+```
+
+ID Existe
+Status Code: 400
+```python
+{
+    "error":"Ya existe un estudiante registrando con el ID xxxx"
+}
+```
+
+Faltan Datos o son Incorrectos
+Status Code: 400
+```python
+{
+    "error":"Los datos del estudiante no están completos o son incorrectos"
+}
+```
+
+Respuestas a PUT Actualizar Estudiante
+
+ID Existe y la data está completa y correcta
+Status Code: 200
+```python
+{
+    "cedula":2354656,
+    "nombre":"Julian",
+    "apellido":"Parras",
+    "correo":"julian.parras@misena.edu.co",
+    "carrera":"Electrónica"
+}
+```
+
+ID No Existe
+Status Code: 400
+```python
+{
+    "error":"No se encontró ningún estudiante con el ID xxxx"
+}
+```
+
+Faltan Datos o son Incorrectos
+Status Code: 400
+```python
+{
+    "error":"Los datos del estudiante no están completos o son incorrectos"
+}
+```
+
+Respuestas a DELETE Borrar Estudiante
+
+ID Existe
+Status Code: 200
+```python
+{
+    "cedula":2354656,
+    "borrado":True
+}
+```
+
+ID No Existe
+Status Code: 400
+```python
+{
+    "error":"No se encontró ningún estudiante con el ID xxxx"
+}
+```
+
+Faltan Datos o son Incorrectos
+Status Code: 400
+```python
+{
+    "error":"Los datos del estudiante no están completos o son incorrectos"
+}
+
+
+```python
+@app.route("/estudiantes",methods=['GET'])
+def obtener_estudiantes():
+    lista_estudiantes=[estudiantes_db[key] for key in estudiantes_db.keys()]
+    return jsonify(lista_estudiantes),200
+```
+
+```python
+@app.route("/estudiantes/<int:id>",methods=['GET'])
+def obtener_estudiante(id):
+    try:
+      estudiante=estudiantes_db[str(id)]
+      return jsonify(estudiante),200
+    except:
+      error_message={"error":f"No se encontró ningún estudiante con el ID {id}"}
+      return jsonify(error_message),400
+```
+
+```python
+@app.route("/estudiantes",methods=['POST'])
+def agregar_estudiante():
+
+  estudiante_id=str(request.json["cedula"])
+  if(estudiante_id in estudiantes_db):
+    error_message={"error":f"Ya existe un estudiante registrando con el ID {estudiante_id}"}
+    return jsonify(error_message),400
+    
+  try:  
+    nuevo_estudiante=dict()
+    nuevo_estudiante["cedula"]=request.json["cedula"]
+    nuevo_estudiante["nombre"]=request.json["nombre"]
+    nuevo_estudiante["apellido"]=request.json["apellido"]
+    nuevo_estudiante["carrera"]=request.json["carrera"]
+    nuevo_estudiante["correo"]=request.json["correo"]
+    estudiantes_db[estudiante_id]=nuevo_estudiante
+    return jsonify(nuevo_estudiante),201
+  except:
+      error_message={"error":"Los datos del estudiante no están completos o son incorrectos"}
+      return jsonify(error_message),400
+```
+
+Ejercicio: Programe las respuestas para los verbos PUT y DELETE
