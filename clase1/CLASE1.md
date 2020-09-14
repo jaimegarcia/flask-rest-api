@@ -1,5 +1,18 @@
 # Módulo 3 Introducción a las arquitecturas y desarrollo con API Rest - Clase 1 
 
+# Tabla de Contenido
+
+<!-- toc -->
+
+- [Instalación de Python, VSCODE, Venv y Flask](#instalación-de-python-vscode-venv-y-flask)
+  - [Instalación de Python](#instalación-de-python)
+  - [Instalación de VSCode](#instalación-de-vscode)
+  - [Instalación del Virtual Environment](#instalación-del-virtual-environment)
+  - [Instalación y Ejecución de Flaskt](#instalación-y-ejecución-de-flask)
+- [Desarrollo de REST API](#desarrollo-de-rest-api)
+
+<!-- tocstop -->
+
 ## Instalación de Python, VSCODE, Venv y Flask
 
 
@@ -259,7 +272,7 @@ Para instalar Rest Client, vaya a extensiones en VSCode busque Rest Client, haga
 También puede utilizar Postman. Para instalar Postman, ingrese a https://www.postman.com/, registrese y descargué el producto
 
 
-### Desarrollo de REST API
+## Desarrollo de REST API
 
 Vamos a crear una base de datos en un diccionario local
 ```python
