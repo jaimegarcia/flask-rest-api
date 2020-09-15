@@ -167,19 +167,57 @@ def obtener_peticiones(id):
 
     if(estudiante_doc.get().exists):
         try:  
-            query = peticiones_ref.order_by('fecha_creacion', direction = firestore.Query.DESCENDING)
+            query = peticiones_ref.where('cedula','==',id).order_by('fecha_atencion')
             results = query.stream()
             print("results",results)
             lista_peticiones=[to_dict_with_id(item) for item in results]
             print("lista_peticiones",lista_peticiones)
 
             return jsonify({"data":lista_peticiones}),200
-        except:
+        except Exception as err:
+            print("err",err)
             error_message={"error":"Los datos de la petición no están completos o son incorrectos"}
             return jsonify(error_message),400
     else:
         error_message={"error":f"No se encontró ningún estudiante con el ID {id}"}
         return jsonify(error_message),400
+
+
+@app.route("/api/estudiantes/<int:id>/peticiones/<string:pid>",methods=['GET','PUT','DELETE'])
+def obtener_peticion(id,pid):
+
+    estudiante_id=str(id)
+    estudiante_doc=estudiantes_ref.document(estudiante_id).get()
+
+    if(estudiante_doc.exists):
+        peticion_doc = peticiones_ref.document(pid).get()
+        if(peticion_doc.exists): 
+            if(request.method=='GET'):
+                peticion_dict=peticion_doc.to_dict()
+                peticion_dict["id"]=pid
+                return jsonify(peticion_dict),200
+            elif(request.method=='PUT'):
+                data=request.json
+                try:  
+                    nueva_peticion=Peticion(data["cedula"], data["peticion"], data["fecha_atencion"]).to_dict()
+                    peticiones_ref.document(pid).update(nueva_peticion)
+                    nueva_peticion["id"]=pid
+                    return jsonify(nueva_peticion),200
+                except:
+                    error_message={"error":"Los datos de la petición no están completos o son incorrectos"}
+                    return jsonify(error_message),400
+            else:
+                peticiones_ref.document(pid).delete()
+                result={"peticion":pid,"borrado":True}
+                return jsonify(result),200
+        else:
+            error_message={"error":f"No se encontró ninguna petición con el ID {pid}"}
+            return jsonify(error_message),400
+    else:
+        error_message={"error":f"No se encontró ningún estudiante con el ID {id}"}
+        return jsonify(error_message),400
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)

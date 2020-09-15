@@ -238,4 +238,77 @@ Should You Version Your API?
 Ejercicio: Crear las Rutas para Put and Delete con Conexión a la base de datos y validación
 
 
+Continuamos con la ruta de peticiones. Primero vamos a crear el POST para Agregar peticiones relacionadas con un estudiante
+```python
+@app.route("/api/estudiantes/<int:id>/peticiones",methods=['POST'])
+def crear_peticion(id):
 
+    data=request.json
+    estudiante_id=str(id)
+    estudiante_doc=estudiantes_ref.document(estudiante_id)
+
+    if(estudiante_doc.get().exists):
+        try:  
+            nueva_peticion=Peticion(data["cedula"], data["peticion"], data["fecha_atencion"]).to_dict()
+            peticion_ref=peticiones_ref.add(nueva_peticion)
+            nueva_peticion["id"]=peticion_ref[1].id
+
+            return jsonify(nueva_peticion),200
+        except:
+            error_message={"error":"Los datos de la petición no están completos o son incorrectos"}
+            return jsonify(error_message),400
+    else:
+        error_message={"error":f"No se encontró ningún estudiante con el ID {id}"}
+        return jsonify(error_message),400
+```
+
+
+Ahora vamos a generar la ruta GET para obtener todas las peticiones de un estudiantes
+
+```python
+@app.route("/api/estudiantes/<int:id>/peticiones",methods=['GET'])
+def obtener_peticiones(id):
+
+    estudiante_id=str(id)
+    estudiante_doc=estudiantes_ref.document(estudiante_id)
+
+    if(estudiante_doc.get().exists):
+        try:  
+            query = peticiones_ref.where('cedula','==',id).order_by('fecha_atencion')
+            results = query.stream()
+            lista_peticiones=[to_dict_with_id(item) for item in results]
+            return jsonify({"data":lista_peticiones}),200
+        except Exception as err:
+            error_message={"error":"Los datos de la petición no están completos o son incorrectos"}
+            return jsonify(error_message),400
+    else:
+        error_message={"error":f"No se encontró ningún estudiante con el ID {id}"}
+        return jsonify(error_message),400
+```
+
+Para generar la respuesta, vamos a crear una función que tome cada resultado, lo convierta diccionaro y le incluya el id del documento
+
+
+```python
+def to_dict_with_id(item):
+    print(item,item.id)
+    item_dict=item.to_dict()
+    item_dict["id"]=item.id
+    return item_dict
+```
+
+Cuando ejecutamos la consulta, vamos a ver que da el siguiente error
+
+### Obtener Peticiones
+GET http://localhost:5000/api/estudiantes/{{cedula2}}/peticiones
+Content-Type: application/json
+
+![composite-index-1](images/composite-index-1.png)
+
+Si vamos al enlace que nos genera el error, nos va a dar la posibilidad de crear un índice compuesto, hacemos click en Crear
+
+![composite-index-2](images/composite-index-2.png)
+
+Después de unos minutos, el índice quedará creado, si volvemos a hacer la consulta, esta vez funcionará correctamente
+
+![composite-index-3](images/composite-index-3.png)
