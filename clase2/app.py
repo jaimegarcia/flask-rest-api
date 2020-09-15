@@ -34,17 +34,30 @@ def agregar_estudiante():
 
     data=request.json
     estudiante_id=str(request.json["cedula"])
-    '''if(estudiante_id in estudiantes_db):
+    estudiante_doc=estudiantes_ref.document(estudiante_id)
+    if(estudiante_doc.get().exists):
         error_message={"error":f"Ya existe un estudiante registrando con el ID {estudiante_id}"}
-        return jsonify(error_message),400'''
-
+        return jsonify(error_message),400
     try:  
         nuevo_estudiante=Estudiante(data["cedula"], data["nombre"], data["apellido"],data["correo"], data["carrera"]).to_dict()
-        estudiantes_ref.document(estudiante_id).set(nuevo_estudiante)
+        estudiante_doc.set(nuevo_estudiante)
         return jsonify(nuevo_estudiante),201
     except:
         error_message={"error":"Los datos del estudiante no están completos o son incorrectos"}
         return jsonify(error_message),400
+
+
+@app.route("/api/estudiantes/<int:id>",methods=['GET'])
+def obtener_estudiante(id):
+
+    estudiante_doc=estudiantes_ref.document(str(id)).get()
+    if(estudiante_doc.exists):
+      print("estudiante_doc",estudiante_doc.to_dict())
+      return jsonify(estudiante_doc),200
+    else:
+      error_message={"error":f"No se encontró ningún estudiante con el ID {id}"}
+      return jsonify(error_message),400
+
 
 @app.route('/add', methods=['POST'])
 def create():

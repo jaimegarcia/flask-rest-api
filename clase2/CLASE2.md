@@ -164,28 +164,44 @@ if __name__ == '__main__':
 
 
 Vamos a agregar la primera ruta: POST para Agregar nuevos estudiantes
-
-@app.route("/estudiantes",methods=['POST'])
+```python
+@app.route("/api/estudiantes",methods=['POST'])
 def agregar_estudiante():
 
-  estudiante_id=str(request.json["cedula"])
-  if(estudiante_id in estudiantes_db):
-    error_message={"error":f"Ya existe un estudiante registrando con el ID {estudiante_id}"}
-    return jsonify(error_message),400
-    
-  try:  
-    nuevo_estudiante=dict()
-    nuevo_estudiante["cedula"]=request.json["cedula"]
-    nuevo_estudiante["nombre"]=request.json["nombre"]
-    nuevo_estudiante["apellido"]=request.json["apellido"]
-    nuevo_estudiante["carrera"]=request.json["carrera"]
-    nuevo_estudiante["correo"]=request.json["correo"]
-    estudiantes_db[estudiante_id]=nuevo_estudiante
-    return jsonify(nuevo_estudiante),201
-  except:
-      error_message={"error":"Los datos del estudiante no están completos o son incorrectos"}
-      return jsonify(error_message),400
+    data=request.json
+    estudiante_id=str(request.json["cedula"])
+    try:  
+        nuevo_estudiante=Estudiante(data["cedula"], data["nombre"], data["apellido"],data["correo"], data["carrera"]).to_dict()
+        estudiantes_ref.document(estudiante_id).set(nuevo_estudiante)
+        return jsonify(nuevo_estudiante),201
+    except:
+        error_message={"error":"Los datos del estudiante no están completos o son incorrectos"}
+        return jsonify(error_message),400
+```
 
+Qué pasa si volvemos a crear un estudiante con la misma cédula?
+
+Nos falta validar si ya existe un documento con el mismo ID, en cuyo caso retornamos error
+```python
+@app.route("/api/estudiantes",methods=['POST'])
+def agregar_estudiante():
+
+    data=request.json
+    estudiante_id=str(request.json["cedula"])
+    estudiantes_doc=estudiantes_ref.document(estudiante_id)
+    if(estudiantes_doc.get().exists):
+        error_message={"error":f"Ya existe un estudiante registrando con el ID {estudiante_id}"}
+        return jsonify(error_message),400
+    try:  
+        nuevo_estudiante=Estudiante(data["cedula"], data["nombre"], data["apellido"],data["correo"], data["carrera"]).to_dict()
+        estudiantes_doc.set(nuevo_estudiante)
+        return jsonify(nuevo_estudiante),201
+    except:
+        error_message={"error":"Los datos del estudiante no están completos o son incorrectos"}
+        return jsonify(error_message),400
+```
+
+Continuemos con la ruta de GET para Obtener la información de un estudiante
 
 Request
 
