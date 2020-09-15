@@ -6,19 +6,15 @@
 <!-- toc -->
 
 - [Conexión a la Base de Datos Cloud FireStore](#conexión-a-la-base-de-datos-cloud-firestore)
-- [Creación de Clases con Modelo de Datos](#instalación-de-python)
-  - [Instalación de VSCode](#instalación-de-vscode)
-  - [Instalación del Virtual Environment](#instalación-del-virtual-environment)
-  - [Instalación y Ejecución de Flask](#instalación-y-ejecución-de-flask)
-- [Desarrollo de REST API](#desarrollo-de-rest-api)
-  - [Nuestro Primer Rest API](#nuestro-primer-rest-api)
-  - [Buenas prácticas a la hora de diseñar una REST API](#buenas-prácticas-a-la-hora-de-diseñar-una-rest-api)
-  - [Verbos POST, PUT y DELETE](#verbos-post-put-y-delete)
-  - [Desarrollo de Repuestas de REST API](#desarrollo-de-repuestas-de-rest-api)
-    - [Diseño de Repuestas](#diseño-de-repuestas)
-    - [Programación de Respuestas a Verbo GET](#programación-de-respuestas-a-verbo-get)
-    - [Programación de Respuestas a Verbo POST](#programación-de-respuestas-a-verbo-post)
-    - [Programación de Respuestas a Verbos PUT y DELETE](#programación-de-respuestas-a-verbos-put-y-delete)
+- [Creación de Clases con Modelo de Datos](#creación-de-clases-con-modelo-de-datos)
+- [Creación de Rutas para Estudiantes](#creación-de-rutas-para-estudiantes)
+  - [Agregar Estudiantes](#agregar-estudiantes)
+  - [Obtener Estudiantes](#obtener-estudiantes)
+  - [Actualizar y Borrar Estudiantes](#actualizar-y-borrar-estudiantes)
+- [Creación de Rutas para Peticiones](#creación-de-rutas-para-peticiones)
+  - [Agregar Peticiones](#agregar-peticiones)
+  - [Obtener Peticiones](#obtener-peticiones)
+  - [Actualizar, Aprobar y Borrar Peticiones](#actualizar-aprobar-y-borrar-peticiones)
 
 
 <!-- tocstop -->
@@ -233,6 +229,8 @@ print(nueva_peticion.to_dict(),nueva_peticion.fecha_creacion,nueva_peticion.fech
 if __name__ == '__main__':
     app.run(debug=True)
 ```
+
+
 ## Creación de Rutas para Estudiantes
 
 ### Agregar Estudiantes
@@ -513,7 +511,7 @@ class Peticion:
 **root**
 
 app.py
-
+```python
 from flask import Flask, request, jsonify
 from firebase_admin import credentials, firestore, initialize_app
 
@@ -545,8 +543,6 @@ nueva_peticion=Peticion(122345, "Asesoria",'25/09/20 7:00:00')
 print(nueva_peticion.to_dict(),nueva_peticion.fecha_creacion,nueva_peticion.fecha_atencion)
 
 
-
-```python
 @app.route("/api/estudiantes",methods=['POST'])
 def agregar_estudiante():
 
@@ -661,6 +657,8 @@ def obtener_peticiones(id):
         return jsonify(error_message),400
 
 ```
+
+### Actualizar, Aprobar y Borrar Peticiones
 
 > **Ejercicio**: Realizar las rutas GET para Obtener una Petición, PATCH para Actualización del Estado, PUT para Actualizarla completamente y DELETE para borrarla
 
