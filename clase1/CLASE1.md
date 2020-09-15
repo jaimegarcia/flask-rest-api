@@ -12,12 +12,12 @@
 - [Desarrollo de REST API](#desarrollo-de-rest-api)
   - [Nuestro Primer Rest API](#nuestro-primer-rest-api)
   - [Buenas prácticas a la hora de diseñar una REST API](#buenas-prácticas-a-la-hora-de-diseñar-una-rest-api)
-  - [Verbos POST, PUT y DELETE](#verbos-post-put-delete)
-  - [Desarrollo de Repuestas de REST API](#desarrollo-de-respuestas-de-rest-api)
-    - [Diseño de Repuestas](#diseño-de-respuestas)
-    - [Programación de Respuestas a Verbo GET](#programacion-de-respuesta-a-verbo-get)
-    - [Programación de Respuestas a Verbo POST](#programacion-de-respuesta-a-verbo-post)
-    - [Programación de Respuestas a Verbos PUT y DELETE](#programacion-de-respuesta-a-verbo-post)
+  - [Verbos POST, PUT y DELETE](#verbos-post-put-y-delete)
+  - [Desarrollo de Repuestas de REST API](#desarrollo-de-repuestas-de-rest-api)
+    - [Diseño de Repuestas](#diseño-de-repuestas)
+    - [Programación de Respuestas a Verbo GET](#programación-de-respuestas-a-verbo-get)
+    - [Programación de Respuestas a Verbo POST](#programación-de-respuesta-a-verbo-post)
+    - [Programación de Respuestas a Verbos PUT y DELETE](#programación-de-respuestas-a-verbos-put-y-delete)
 
 #### Programación de Respuestas a Verbo POST
 
