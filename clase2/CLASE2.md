@@ -312,3 +312,11 @@ Si vamos al enlace que nos genera el error, nos va a dar la posibilidad de crear
 Después de unos minutos, el índice quedará creado, si volvemos a hacer la consulta, esta vez funcionará correctamente
 
 ![composite-index-3](images/composite-index-3.png)
+
+
+
+
+
+Ejercicio: Realizar las rutas GET para Obtener una Petición, PUT para Actualizarla y DELETE para borrarla
+
+
