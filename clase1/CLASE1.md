@@ -19,8 +19,6 @@
     - [Programación de Respuestas a Verbo POST](#programación-de-respuestas-a-verbo-post)
     - [Programación de Respuestas a Verbos PUT y DELETE](#programación-de-respuestas-a-verbos-put-y-delete)
 
-#### Programación de Respuestas a Verbo POST
-
 
 <!-- tocstop -->
 
