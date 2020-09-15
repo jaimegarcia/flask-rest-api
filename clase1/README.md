@@ -1,4 +1,5 @@
-# Módulo 3 Introducción a las arquitecturas y desarrollo con API Rest - Clase 1 
+# Módulo 3 Introducción a las arquitecturas y desarrollo con API Rest 
+# Clase 1 
 
 # Tabla de Contenido
 
@@ -336,7 +337,7 @@ estudiantes_db={
   }
 }
 ```
-
+> ¿Por qué esta estructura?
 
 
 ### Nuestro Primer Rest API

@@ -1,13 +1,8 @@
 @cedula=2354659
 @cedula2=2354659
-### Hola Mundo
-GET http://localhost:5000/
-
-### Saludo
-GET http://localhost:5000/saludo/jaime?titulo=Sr
 
 ### Listar todos los estudiantes
-DELETE http://localhost:5000/api/estudiantes
+GET http://localhost:5000/api/estudiantes
 
 
 
@@ -60,19 +55,30 @@ Content-Type: application/json
 
 
 ### Obtener Petición
-GET http://localhost:5000/api/estudiantes/{{cedula2}}/peticiones/FXyLyC5t1ddLkmPbdaXA
+GET http://localhost:5000/api/estudiantes/{{cedula2}}/peticiones/wlgEDbpHw6A1v7iqHLbN
 Content-Type: application/json
 
+
+
+### Aprobar Petición
+PATCH http://localhost:5000/api/estudiantes/{{cedula2}}/peticiones/wlgEDbpHw6A1v7iqHLbN
+Content-Type: application/json
+
+{
+  "estado": "Aprobada"
+}
+
 ### Actualizar Petición
-PUT http://localhost:5000/api/estudiantes/{{cedula2}}/peticiones/FXyLyC5t1ddLkmPbdaXA
+PUT http://localhost:5000/api/estudiantes/{{cedula2}}/peticiones/wlgEDbpHw6A1v7iqHLbN
 Content-Type: application/json
 
 {
   "cedula":2354659,
   "peticion":"Asesoría",
-  "fecha_atencion":"25/09/20 15:00:00"
+  "fecha_atencion":"25/09/20 15:00:00",
+  "estado": "Aprobada"
 }
 
 ### Borrar Petición
-DELETE http://localhost:5000/api/estudiantes/{{cedula2}}/peticiones/FXyLyC5t1ddLkmPbdaXA
+DELETE http://localhost:5000/api/estudiantes/{{cedula2}}/peticiones/wlgEDbpHw6A1v7iqHLbN
 Content-Type: application/json
