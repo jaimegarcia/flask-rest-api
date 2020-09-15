@@ -89,7 +89,7 @@ VsCode nos va a sugerir que utilicemos pylint para revisar nuestro código, hace
 
 ![python-14](images/python-14.png)
 
-Hacemos click en Terminal y ejecutamos los siguientes comandos:
+En Windows hacemos click en el menú de VsCode: Terminal - Nuevo Termina y ejecutamos los siguientes comandos:
 
 ```bash
 py 3 -m venv .venv
@@ -108,7 +108,7 @@ source .venv/bin/activate
 ![python-16](images/python-16.png)
 
 
-Si esta trabajando en MacOs o Linux, ejecute los siguientes comandos
+Si está trabajando en MacOs o Linux, ejecute los siguientes comandos
 
 ```bash
 python3 -m venv .venv
@@ -117,16 +117,31 @@ source .venv/bin/activate
 
 ![python-15](images/python-15.png)
 
+Con esto, ya estamos trabajando en el entorno virtual de python
+
 
 ### Instalación y Ejecución de Flask
 
-En el archivo requirements.tx incluya la librería de Flask
+Flask es un micro-framework que nos permite construir aplicaciones de servidor de forma rápida y eficiente. Ser un micro-framework no es indicativo de que es para aplicaciones pequeñas, por el contrario, significa que añade pocos elementos, permitiendo estar más cercano al lenguaje base, mejorando el rendimiento de la aplicación.
+
+Para organizar nuestro proyecto, vamos a utilizar un archivo requirements.txt para gestionar las librerías. En el archivo requirements.tx incluya la librería de Flask
 
 ```python
 Flask==1.1.2
 ```
 
-En la terminal ejecutamos el siguiente comando:
+Paquete           # Última versión
+Paquete==1.0.4     # Versión específica
+Paquete>=1.0.4     # Mínima versión a instalar
+Paquete>=1.0,<=2.0 # Instalar última versión mayor a 1 y menor que 2
+
+Dado una Versión MAJOR.MINOR.PATCH ,se hace incremento en cada uno cuando:
+
+- MAJOR cuando se hacen cambios que generan incompatbilidad con la versión anterior
+- MINOR cuando se agregan funcionalidades que son retro-compatibles
+- PATCH cuando se corrigen errores que son retro-compatibles
+
+Para instalar la librería, en la terminal ejecutamos el siguiente comando:
 
 En Windows:
 
@@ -140,7 +155,7 @@ En MacOS/Linux:
 pip3 install -r requirements.txt
 ```
 
-En el archivo app.py importe Flask y cree una instancia de un objeto de Flask
+En el archivo app.py importe Flask y cree una instancia de un objeto de Flask. Vamos a ejecutar el modo debug para que se recargue automáticamente y nos muestre más detalle de errores
 
 ```python
 from flask import Flask
@@ -171,6 +186,11 @@ En MacOS/Linux
 python3 -m flask run --reload
 ```
 
+O también puede ejecutar
+```bash
+python app.py
+```
+
 El servidor busca la aplicacción app.py por defecto. Al correr Flask, verá una salida similar a la siguiente:
 ```bash
 (env) python -m flask run --reload
@@ -195,9 +215,9 @@ def hola_mundo():
   return "Adios, Mundo!"
 ```
 
-Se actualizará automáticamente, y si ingresamos de nuevo a la ruta, veremos el nuevo mensaje.
+Se actualizará automáticamente, y si ingresamos de nuevo a la ruta en el navegador, veremos el nuevo mensaje.
 
-Agreguemos una nueva ruta pero con un parametro. La f indica un string con formato, el nombre es reemplazado por el parámetro que recibe la función
+Agreguemos una nueva ruta pero con un parámetro. La f indica un string con formato, el nombre es reemplazado por el parámetro que recibe la función
 
 ```python
 @app.route("/saludo/<nombre>")
@@ -205,7 +225,7 @@ def saludo(nombre):
   return f"Hola {nombre}"
 ```
 
-Podemos indicar el tipo de dato que va a recibir la ruta de la siguiente forma
+Podemos indicar el tipo de dato que va a recibir la ruta de la siguiente forma:
 
 ```python
 @app.route("/saludo/<string:nombre>")
@@ -257,7 +277,7 @@ if __name__ == '__main__':
     app.run(debug=True)
 ```
 
-Ejercicio: Agreguen una nueva ruta que se llame despedida, deb recibir como parte la ruta un string el nombre de la persona y como parámetro la frase de despedida (Chao, Adiós, Sayonara). Es decir que si se ingresa a la ruta /despedida/jaime?tipo=Sayonara la respuesta que debemos obtener es Sayonara jaime
+> Ejercicio: Agreguen una nueva ruta que se llame despedida, deb recibir como dentro de la ruta un string el nombre de la persona y un parámetro con el tipo de frase de despedida (Chao, Adiós, Sayonara). Es decir que si se ingresa a la ruta /despedida/jaime?tipo=Sayonara la respuesta que debemos obtener es Sayonara jaime
 
 
 ### Instalación de Rest Client o Postman

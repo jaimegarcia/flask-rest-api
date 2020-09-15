@@ -1,10 +1,14 @@
-CLASE 1
+CLASE 1 - Introducción a REST API con Python y Flask
 
-[Clase 1](clase1/CLASE1.md)
+En este clase se realiza la introducción al diseño de REST API utilizando Python y Flask
 
-CLASE 2
+[Introducción a REST API con Python y Flask](clase1/CLASE1.md)
 
-[Clase 2](clase2/CLASE2.md)
+CLASE 2- REST API con Cloud FireStore, Python y Flask
+
+En este clase se explica como generar rutas más complejas y conectarse a base de datos para tener persistencia. Utilizamos Cloud Firestore como base de datos no relacional
+
+[REST API con Cloud FireStore, Python y Flask](clase2/CLASE2.md)
 
 CLASE 3
 
