@@ -68,23 +68,34 @@ if __name__ == '__main__':
     app.run(debug=True)
 ```
 
-Vamos a generar dos Clases para nuestro modelo de datos (Estudiantes y Peticiones), creamos una carpeta models y un archivo estudiantes.py
+Vamos a generar dos Clases para nuestro modelo de datos (Estudiante y Petición), creamos una carpeta models y los archivos estudiante.py y peticion.py
 
-La clase de estudiantes sería la siguiente:
+
+Para la instancia de Peticiones debemos incluir la fecha en la zona horaria correcta, importamos pytz, datetime y asignamos la zona horaria
 ```python
-class Estudiante:
-    def __init__(self, cedula, nombre, apellido, correo, carrera):
+import pytz
+from datetime import datetime
+
+timezone = pytz.timezone("America/Bogota")
+```
+
+La clase de petición sería la siguiente:
+```python
+class Peticion:
+    def __init__(self, cedula, peticion, fecha_atencion):
         self.cedula = cedula
-        self.nombre = nombre
-        self.apellido = apellido
-        self.correo = correo
-        self.carrera = carrera
+        self.peticion = peticion
+        self.fecha_atencion = timezone.localize(datetime.strptime(fecha_atencion, '%d/%m/%y %H:%M:%S'))
+        self.fecha_creacion = timezone.localize(datetime.now())
+
 
     def to_dict(self):
         return dict((key, value) for (key, value) in self.__dict__.items())
 ```
 
-Ejercicio: Cree el modelo de Peticion en el archivo peticion.py dentro de la carpeta models, debe tener los siguiente campos: cedula, peticion, fecha_creacion, fecha_atencion
+
+
+Ejercicio: Cree el modelo de Estudiante en el archivo estudiante.py dentro de la carpeta models, debe tener los siguiente campos: cedula, nombre, apellido, correo, carrera
 
 
 Ahora vamos a crear un archivo __init__.py para importar los dos modelos
@@ -110,20 +121,11 @@ print(nuevo_estudiante.to_dict())
 ```
 
 
-Para la instancia de Peticiones debemos incluir la fecha en la zona horaria correcta, importamos pytz, datetime y asignamos la zona horaria
-```python
-import pytz
-from datetime import datetime
 
-timezone = pytz.timezone("America/Bogota")
-```
 
 Ahora creamos una peticion de prueba
 ```python
-nueva_fecha_creacion=timezone.localize(datetime.now())
-nueva_fecha_atencion=timezone.localize(datetime.strptime('25/09/20 7:00:00', '%d/%m/%y %H:%M:%S'))
-
-nueva_peticion=Peticion(122345, "Asesoria",nueva_fecha_creacion,nueva_fecha_atencion)
+nueva_peticion=Peticion(122345, "Asesoria",'25/09/20 7:00:00')
 print(nueva_peticion.to_dict(),nueva_peticion.fecha_creacion,nueva_peticion.fecha_atencion)
 ```
 
@@ -132,10 +134,6 @@ El código completo que llevamos hasta el momento es el siguiente:
 
 from flask import Flask, request, jsonify
 from firebase_admin import credentials, firestore, initialize_app
-import pytz
-from datetime import datetime
-
-timezone = pytz.timezone("America/Bogota")
 
 from models import Estudiante,Peticion
 
@@ -152,10 +150,7 @@ peticiones_ref = db.collection('Peticiones')
 nuevo_estudiante=Estudiante(122345, "Jaime", "Garcia", "jaime.garcia", "Electronica")
 print(nuevo_estudiante.to_dict())
 
-nueva_fecha_creacion=timezone.localize(datetime.now())
-nueva_fecha_atencion=timezone.localize(datetime.strptime('25/09/20 7:00:00', '%d/%m/%y %H:%M:%S'))
-
-nueva_peticion=Peticion(122345, "Asesoria",nueva_fecha_creacion,nueva_fecha_atencion)
+nueva_peticion=Peticion(122345, "Asesoria",'25/09/20 7:00:00')
 print(nueva_peticion.to_dict(),nueva_peticion.fecha_creacion,nueva_peticion.fecha_atencion)
 
 if __name__ == '__main__':
@@ -238,3 +233,9 @@ Should You Version Your API?
 
 
 /v1/estudiantes/1324345/tareas
+
+
+Ejercicio: Crear las Rutas para Put and Delete con Conexión a la base de datos y validación
+
+
+
