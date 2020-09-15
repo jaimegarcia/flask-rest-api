@@ -1,9 +1,6 @@
 from flask import Flask, request, jsonify
 from firebase_admin import credentials, firestore, initialize_app
-import pytz
-from datetime import datetime
 
-timezone = pytz.timezone("America/Bogota")
 
 from models import Estudiante,Peticion
 
@@ -20,10 +17,9 @@ peticiones_ref = db.collection('Peticiones')
 nuevo_estudiante=Estudiante(122345, "Jaime", "Garcia", "jaime.garcia", "Electronica")
 print(nuevo_estudiante.to_dict())
 
-nueva_fecha_creacion=timezone.localize(datetime.now())
-nueva_fecha_atencion=timezone.localize(datetime.strptime('25/09/20 7:00:00', '%d/%m/%y %H:%M:%S'))
 
-nueva_peticion=Peticion(122345, "Asesoria",nueva_fecha_creacion,nueva_fecha_atencion)
+
+nueva_peticion=Peticion(122345, "Asesoria",'25/09/20 7:00:00')
 print(nueva_peticion.to_dict(),nueva_peticion.fecha_creacion,nueva_peticion.fecha_atencion)
 
 
@@ -88,25 +84,128 @@ def read():
         if todo_id:
             todo = estudiantes_ref.document(todo_id).get()
             return jsonify(todo.to_dict()), 200
+@app.route("/api/estudiantes/<int:id>",methods=['PUT'])
+def actualizar_estudiante(id):
+
+    data=request.json
+    estudiante_id=str(id)
+    estudiante_doc=estudiantes_ref.document(estudiante_id)
+
+    if(estudiante_doc.get().exists):
+        try:  
+            nuevo_estudiante=Estudiante(data["cedula"], data["nombre"], data["apellido"],data["correo"], data["carrera"]).to_dict()
+            estudiantes_ref.document(estudiante_id).update(nuevo_estudiante)
+            return jsonify(nuevo_estudiante),200
+        except:
+            error_message={"error":"Los datos del estudiante no están completos o son incorrectos"}
+            return jsonify(error_message),400
+    else:
+        error_message={"error":f"No se encontró ningún estudiante con el ID {id}"}
+        return jsonify(error_message),400
+
+
+@app.route("/api/estudiantes/<int:id>",methods=['DELETE'])
+def eliminar_estudiante(id):
+
+    estudiante_id=str(id)
+    estudiante_doc=estudiantes_ref.document(estudiante_id)
+
+    if(estudiante_doc.get().exists):
+        estudiante_doc.delete()
+        result={"cedula":id,"borrado":True}
+        return jsonify(result),200
+    else:
+        error_message={"error":f"No se encontró ningún estudiante con el ID {id}"}
+        return jsonify(error_message),400
+
+
+
+@app.route("/api/estudiantes/<int:id>/peticiones",methods=['POST'])
+def crear_peticion(id):
+
+    data=request.json
+    estudiante_id=str(id)
+    estudiante_doc=estudiantes_ref.document(estudiante_id)
+
+    if(estudiante_doc.get().exists):
+        try:  
+            nueva_peticion=Peticion(data["cedula"], data["peticion"], data["fecha_atencion"]).to_dict()
+            peticion_ref=peticiones_ref.add(nueva_peticion)
+            nueva_peticion["id"]=peticion_ref[1].id
+
+            return jsonify(nueva_peticion),200
+        except:
+            error_message={"error":"Los datos de la petición no están completos o son incorrectos"}
+            return jsonify(error_message),400
+    else:
+        error_message={"error":f"No se encontró ningún estudiante con el ID {id}"}
+        return jsonify(error_message),400
+
+
+def to_dict_with_id(item):
+    print(item,item.id)
+    item_dict=item.to_dict()
+    item_dict["id"]=item.id
+    return item_dict
+
+@app.route("/api/estudiantes/<int:id>/peticiones",methods=['GET'])
+def obtener_peticiones(id):
+
+    estudiante_id=str(id)
+    estudiante_doc=estudiantes_ref.document(estudiante_id)
+
+    if(estudiante_doc.get().exists):
+        try:  
+            query = peticiones_ref.where('cedula','==',id).order_by('fecha_atencion')
+            results = query.stream()
+            print("results",results)
+            lista_peticiones=[to_dict_with_id(item) for item in results]
+            print("lista_peticiones",lista_peticiones)
+
+            return jsonify({"data":lista_peticiones}),200
+        except Exception as err:
+            print("err",err)
+            error_message={"error":"Los datos de la petición no están completos o son incorrectos"}
+            return jsonify(error_message),400
+    else:
+        error_message={"error":f"No se encontró ningún estudiante con el ID {id}"}
+        return jsonify(error_message),400
+
+
+@app.route("/api/estudiantes/<int:id>/peticiones/<string:pid>",methods=['GET','PUT','DELETE'])
+def obtener_peticion(id,pid):
+
+    estudiante_id=str(id)
+    estudiante_doc=estudiantes_ref.document(estudiante_id).get()
+
+    if(estudiante_doc.exists):
+        peticion_doc = peticiones_ref.document(pid).get()
+        if(peticion_doc.exists): 
+            if(request.method=='GET'):
+                peticion_dict=peticion_doc.to_dict()
+                peticion_dict["id"]=pid
+                return jsonify(peticion_dict),200
+            elif(request.method=='PUT'):
+                data=request.json
+                try:  
+                    nueva_peticion=Peticion(data["cedula"], data["peticion"], data["fecha_atencion"]).to_dict()
+                    peticiones_ref.document(pid).update(nueva_peticion)
+                    nueva_peticion["id"]=pid
+                    return jsonify(nueva_peticion),200
+                except:
+                    error_message={"error":"Los datos de la petición no están completos o son incorrectos"}
+                    return jsonify(error_message),400
+            else:
+                peticiones_ref.document(pid).delete()
+                result={"peticion":pid,"borrado":True}
+                return jsonify(result),200
         else:
-            all_todos = [doc.to_dict() for doc in estudiantes_ref.stream()]
-            return jsonify(all_todos), 200
-    except Exception as e:
-        return f"An Error Occured: {e}"
+            error_message={"error":f"No se encontró ninguna petición con el ID {pid}"}
+            return jsonify(error_message),400
+    else:
+        error_message={"error":f"No se encontró ningún estudiante con el ID {id}"}
+        return jsonify(error_message),400
 
-
-@app.route('/update/<id>', methods=['POST', 'PUT'])
-def update(id):
-    """
-        update() : Update document in Firestore collection with request body.
-        Ensure you pass a custom ID as part of json body in post request,
-        e.g. json={'id': '1', 'title': 'Write a blog post today'}
-    """
-    try:
-        estudiantes_ref.document(id).update(request.json)
-        return jsonify({"success": True}), 200
-    except Exception as e:
-        return f"An Error Occured: {e}"
 
 
 if __name__ == '__main__':

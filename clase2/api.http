@@ -40,6 +40,39 @@ Content-Type: application/json
 }
 
 
-### Eliminar estudiante
+### Eliminar Estudiante
 DELETE http://localhost:5000/api/estudiantes/{{cedula2}}
 
+### Agregar Petición
+POST http://localhost:5000/api/estudiantes/{{cedula2}}/peticiones
+Content-Type: application/json
+
+{
+  "cedula":2354659,
+  "peticion":"Asesoría",
+  "fecha_atencion":"25/09/20 7:00:00"
+}
+
+
+### Obtener Peticiones
+GET http://localhost:5000/api/estudiantes/{{cedula2}}/peticiones
+Content-Type: application/json
+
+
+### Obtener Petición
+GET http://localhost:5000/api/estudiantes/{{cedula2}}/peticiones/FXyLyC5t1ddLkmPbdaXA
+Content-Type: application/json
+
+### Actualizar Petición
+PUT http://localhost:5000/api/estudiantes/{{cedula2}}/peticiones/FXyLyC5t1ddLkmPbdaXA
+Content-Type: application/json
+
+{
+  "cedula":2354659,
+  "peticion":"Asesoría",
+  "fecha_atencion":"25/09/20 15:00:00"
+}
+
+### Borrar Petición
+DELETE http://localhost:5000/api/estudiantes/{{cedula2}}/peticiones/FXyLyC5t1ddLkmPbdaXA
+Content-Type: application/json
