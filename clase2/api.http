@@ -7,7 +7,7 @@ GET http://localhost:5000/
 GET http://localhost:5000/saludo/jaime?titulo=Sr
 
 ### Listar todos los estudiantes
-GET http://localhost:5000/api/estudiantes
+DELETE http://localhost:5000/api/estudiantes
 
 
 

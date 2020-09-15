@@ -8,8 +8,19 @@
   - [Instalación de Python](#instalación-de-python)
   - [Instalación de VSCode](#instalación-de-vscode)
   - [Instalación del Virtual Environment](#instalación-del-virtual-environment)
-  - [Instalación y Ejecución de Flaskt](#instalación-y-ejecución-de-flask)
+  - [Instalación y Ejecución de Flask](#instalación-y-ejecución-de-flask)
 - [Desarrollo de REST API](#desarrollo-de-rest-api)
+  - [Nuestro Primer Rest API](#nuestro-primer-rest-api)
+  - [Buenas prácticas a la hora de diseñar una REST API](#buenas-prácticas-a-la-hora-de-diseñar-una-rest-api)
+  - [Verbos POST, PUT y DELETE](#verbos-post-put-delete)
+  - [Desarrollo de Repuestas de REST API](#desarrollo-de-respuestas-de-rest-api)
+    - [Diseño de Repuestas](#diseño-de-respuestas)
+    - [Programación de Respuestas a Verbo GET](#programacion-de-respuesta-a-verbo-get)
+    - [Programación de Respuestas a Verbo POST](#programacion-de-respuesta-a-verbo-post)
+    - [Programación de Respuestas a Verbos PUT y DELETE](#programacion-de-respuesta-a-verbo-post)
+
+#### Programación de Respuestas a Verbo POST
+
 
 <!-- tocstop -->
 
@@ -277,7 +288,7 @@ if __name__ == '__main__':
     app.run(debug=True)
 ```
 
-> Ejercicio: Agreguen una nueva ruta que se llame despedida, deb recibir como dentro de la ruta un string el nombre de la persona y un parámetro con el tipo de frase de despedida (Chao, Adiós, Sayonara). Es decir que si se ingresa a la ruta /despedida/jaime?tipo=Sayonara la respuesta que debemos obtener es Sayonara jaime
+> **Ejercicio**: Agregue una nueva ruta que se llame despedida, deb recibir como dentro de la ruta un string el nombre de la persona y un parámetro con el tipo de frase de despedida (Chao, Adiós, Sayonara). Es decir que si se ingresa a la ruta /despedida/jaime?tipo=Sayonara la respuesta que debemos obtener es Sayonara jaime
 
 
 ### Instalación de Rest Client o Postman
@@ -328,6 +339,10 @@ estudiantes_db={
 }
 ```
 
+
+
+### Nuestro Primer Rest API
+
 Agregamos un Endpoint para obtener los datos de uno de los estudiantes:
 
 
@@ -348,7 +363,7 @@ def obtener_estudiantes():
   return f"Los estudiantes de este curso son {', '.join(lista_estudiantes)}"
 ```
 
-El código que llevamos hasta el momento, es el siguiente:
+El código que llevamos hasta el momento es el siguiente:
 
 ```python
 from flask import Flask,request
@@ -417,7 +432,7 @@ Ventajas
 
 REST es utilizada por la mayoría de empresas de tecnología del mundo, incluyendo a Google, Netflix, Twitter, Amazon, Facebook y Microsoft
 
-#### Buenas prácticas a la hora de diseñar una REST API
+### Buenas prácticas a la hora de diseñar una REST API
 
 Use pronombres en plural para indicar los recursos asociados
 ```
@@ -497,7 +512,7 @@ Idempotencia: Operación que puede ser aplica múltiples veces, sin cambiar el r
 - GET, PUT, PATCH y DELETE: Idempotentes
 - POST no es idempotente
 
-
+### Verbos POST, PUT y DELETE
 
 Generemos una ruta con el verbo POST para agregar un nuevo estudiante:
 
@@ -524,7 +539,69 @@ Content-Type: application/json
 }
 ```
 
-Ejercicio: Complete el código para las rutas con verbos PUT (actualizar toda la información del estudiante a partir de la cédula) y DELETE (eliminar el estudiante a partir de la cédula). Recuerde la función del para borrar atributos de un diccionario
+Este es el código que llevamos hasta el momento:
+
+```python
+from flask import Flask,request
+import sys
+
+app = Flask(__name__)
+
+
+estudiantes_db={
+  "11234224":{
+    "cedula":11234224,
+    "nombre":"Juana",
+    "apellido":"Correa",
+    "correo":"juana.correa@misena.edu.co",
+    "carrera":"Electrónica"
+  },
+  "12434236":{
+    "cedula":12434236,
+    "nombre":"Jaime",
+    "apellido":"García",
+    "correo":"jaime.garcia@misena.edu.co",
+    "carrera":"Administración"
+  },
+  "61236224":{
+    "cedula":61236224,
+    "nombre":"Roberta",
+    "apellido":"Mejia",
+    "correo":"roberta.mejia@misena.edu.co",
+    "carrera":"Sistemas"
+  },
+  "52433236":{
+    "cedula":52433236,
+    "nombre":"Miriam",
+    "apellido":"Zapata",
+    "correo":"miriam.zapata@misena.edu.co",
+    "carrera":"Sistemas"
+  }
+}
+
+@app.route("/api/estudiantes")
+def obtener_estudiantes():
+  print('Hello world!')  
+  lista_estudiantes=[f"{estudiantes_db[key]['nombre']} {estudiantes_db[key]['apellido']}" for key in estudiantes_db.keys()]
+  return f"Los estudiantes de este curso son {', '.join(lista_estudiantes)}"
+
+@app.route("/api/estudiantes/<int:id>")
+def obtener_estudiante(id):
+  estudiante=estudiantes_db[str(id)]
+  return f"Estudiante con cédula {id} se llama {estudiante['nombre']} {estudiante['apellido']} y es de la carrera {estudiante['carrera']} "
+
+@app.route("/estudiantes",methods=['POST'])
+def agregar_estudiante():
+    estudiante_id=str(request.json["cedula"])
+    estudiantes_db[estudiante_id]=request.json
+    return f"Estudiante con ID {estudiante_id} agregado"
+
+if __name__ == '__main__':
+    app.run(debug=True)
+```
+
+
+> **Ejercicio**: Complete el código para las rutas con verbos PUT (actualizar toda la información del estudiante a partir de la cédula) y DELETE (eliminar el estudiante a partir de la cédula). Recuerde la función del para borrar atributos de un diccionario
 
 ```python
 @app.route("/estudiantes/<int:id>",methods=['PUT'])
@@ -534,7 +611,7 @@ def actualizar_estudiante(id):
 def eliminar_estudiante(id):
 ```
 
-Estas serían las consultas de Actualización y borrado
+Estas serían las consultas de Actualización y borrado en Rest Client para que prueben el resultado
 
 ```python
 @cedula2=2354656
@@ -555,6 +632,8 @@ Content-Type: application/json
 DELETE http://localhost:5000/estudiantes/{{cedula2}}
 ```
 
+### Desarrollo de Repuestas de REST API
+
 #### Diseño de Repuestas
 
 - Use los códigos de respuesta adecuados
@@ -568,61 +647,40 @@ Flask cubre varios de los errores. Intente ejecutar la siguiente petición:
 ```
 DELETE http://localhost:5000/estudiantes
 ```
+**Códigos de Estado**
 
+**2xx: Peticiones correctas**
+Código que indica que la petición se realizó correctamente
 
-2xx: Peticiones correctas
-Esta clase de código de estado indica que la petición fue recibida correctamente, entendida y aceptada.
+200 OK - Respuesta estándar para peticiones correctas.
+201 Creado - Recurso creado
 
-200 OK
-Respuesta estándar para peticiones correctas.
-201 Createds
-La petición ha sido completada y ha resultado en la creación de un nuevo recurso.
-
-3xx: Redirecciones
+**3xx: Redirecciones**
 El cliente tiene que tomar una acción adicional para completar la petición.
 
-301 Moved Permanently
-Esta y todas las peticiones futuras deberían ser dirigidas a la URL dada.
+301 Trasladado de forma permanente - El recurso cambio de ruta de forma permanentemente
 
-4xx: Errores del cliente
+**4xx: Errores del cliente**
 
-El error 404 en Wikipedia
-La solicitud contiene sintaxis incorrecta o no puede procesarse.
+400 Petición Errónea - Hay errores en el formato de datos enviados en la petición
 
-La intención de la clase de códigos de respuesta 4xx es para casos en los cuales el cliente parece haber errado la petición. Excepto cuando se responde a una petición HEAD, el servidor debe incluir una entidad que contenga una explicación a la situación de error, y si es una condición temporal o permanente. Estos códigos de estado son aplicables a cualquier método de solicitud (como GET o POST). Los agentes de usuario deben desplegar cualquier entidad al usuario. Estos son típicamente los códigos de respuesta de error más comúnmente encontrados.
-
-400 Bad Request
-El servidor no procesará la solicitud, porque no puede, o no debe, debido a algo que es percibido como un error del cliente (ej: solicitud malformada, sintaxis errónea, etc). La solicitud contiene sintaxis errónea y no debería repetirse.
-401 Unauthorized4​
+401 No Autorizado - Indica que la persona no está autorizado para acceder a este recurso debido a que no se auténtico
 Similar al 403 Forbidden, pero específicamente para su uso cuando la autentificación es posible pero ha fallado o aún no ha sido provista. Vea autenticación HTTP básica y Digest access authentication.
-403 Forbidden
-La solicitud fue legal, pero el servidor rehúsa responderla dado que el cliente no tiene los privilegios para realizarla. En contraste a una respuesta 401 No autorizado, autenticarse previamente no va a cambiar la respuesta.
-404 Not Found
-Recurso no encontrado. Se utiliza cuando el servidor web no encuentra la página o recurso solicitado.
 
-5xx: Errores de servidor
-El servidor falló al completar una solicitud aparentemente válida.
+403 Prohibido - Indica que está prohibido acceder a ese recurso dado los privilegios que tiene el usuario autenticado
 
+404 No encontrado - Recurso no encontrado
 
-500 Internal Server Error
-Es un código comúnmente emitido por aplicaciones empotradas en servidores web, mismas que generan contenido dinámicamente, por ejemplo aplicaciones montadas en IIS o Tomcat, cuando se encuentran con situaciones de error ajenas a la naturaleza del servidor web.
-501 Not Implemented
-El servidor no soporta alguna funcionalidad necesaria para responder a la solicitud del navegador (como por ejemplo el método utilizado para la petición).2​
-502 Bad Gateway
-El servidor está actuando de proxy o gateway y ha recibido una respuesta inválida del otro servidor, por lo que no puede responder adecuadamente a la petición del navegador.2​
-503 Service Unavailable
-El servidor no puede responder a la petición del navegador porque está congestionado o está realizando tareas de mantenimiento.2​
-504 Gateway Timeout
-El servidor está actuando de proxy o gateway y no ha recibido a tiempo una respuesta del otro servidor, por lo que no puede responder adecuadamente a la petición del navegador
-509 Bandwidth Limit Exceeded
-Límite de ancho de banda excedido. Este código de estatus, a pesar de ser utilizado por muchos servidores, no es oficial.
+405 Método no permitido - No puede utilizar ese verbo en la ruta
 
-Vamos a incluir dos librerías más de Flask: Jsonify y Abort
-```python
-from flask import Flask,request,jsonify,abort
-```
+**5xx: Errores de servidor**
+El servidor falló al completar la petición
 
-Respuesta a GET Obtener Todos los Estudiantes
+500 Error Interno del Servidor - Este error no es debido a la petición sino a problemas en el servidor
+
+**Diseño de Respuestas para Rutas de Estudiantes**
+
+**Respuesta a GET Obtener Todos los Estudiantes**
 
 Status Code: 200
 ```python
@@ -660,7 +718,7 @@ Status Code: 200
 }
 ```
 
-Respuestas a GET Obtener Estudiante
+**Respuestas a GET Obtener Estudiante**
 
 ID Existe
 Status Code: 200
@@ -682,7 +740,7 @@ Status Code: 400
 }
 ```
 
-Respuestas a POST Agregar Estudiante
+**Respuestas a POST Agregar Estudiante**
 
 ID No Existe y la data está completa y correcta
 Status Code: 201
@@ -712,7 +770,7 @@ Status Code: 400
 }
 ```
 
-Respuestas a PUT Actualizar Estudiante
+**Respuestas a PUT Actualizar Estudiante**
 
 ID Existe y la data está completa y correcta
 Status Code: 200
@@ -742,7 +800,7 @@ Status Code: 400
 }
 ```
 
-Respuestas a DELETE Borrar Estudiante
+**Respuestas a DELETE Borrar Estudiante**
 
 ID Existe
 Status Code: 200
@@ -769,6 +827,16 @@ Status Code: 400
 }
 ```
 
+#### Programación de Respuestas a Verbo GET
+
+Vamos a incluir dos librerías más de Flask: Jsonify y Abort, para crear las respuestas y abortar peticiones
+
+```python
+from flask import Flask,request,jsonify,abort
+```
+
+
+
 ```python
 @app.route("/estudiantes",methods=['GET'])
 def obtener_estudiantes():
@@ -786,6 +854,8 @@ def obtener_estudiante(id):
       error_message={"error":f"No se encontró ningún estudiante con el ID {id}"}
       return jsonify(error_message),400
 ```
+
+#### Programación de Respuestas a Verbo POST
 
 ```python
 @app.route("/estudiantes",methods=['POST'])
@@ -812,6 +882,7 @@ def agregar_estudiante():
 
 
 Este es el código completo que llevamos hasta el momento:
+
 ```python
 from flask import Flask,request,jsonify,abort
 import sys
@@ -899,5 +970,9 @@ def agregar_estudiante():
       error_message={"error":"Los datos del estudiante no están completos o son incorrectos"}
       return jsonify(error_message),400
 ```
-Ejercicio: Programe las respuestas para los verbos PUT y DELETE
+
+#### Programación de Respuestas a Verbos PUT y DELETE
+
+
+> Ejercicio: Programe las respuestas para los verbos PUT y DELETE
 
