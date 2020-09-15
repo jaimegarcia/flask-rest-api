@@ -16,7 +16,7 @@
   - [Desarrollo de Repuestas de REST API](#desarrollo-de-repuestas-de-rest-api)
     - [Diseño de Repuestas](#diseño-de-repuestas)
     - [Programación de Respuestas a Verbo GET](#programación-de-respuestas-a-verbo-get)
-    - [Programación de Respuestas a Verbo POST](#programación-de-respuesta-a-verbo-post)
+    - [Programación de Respuestas a Verbo POST](#programación-de-respuestas-a-verbo-post)
     - [Programación de Respuestas a Verbos PUT y DELETE](#programación-de-respuestas-a-verbos-put-y-delete)
 
 #### Programación de Respuestas a Verbo POST
