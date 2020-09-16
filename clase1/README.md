@@ -127,12 +127,12 @@ source .venv/bin/activate
 
 ![python-15](images/python-15.png)
 
-Usually, activating a virtualenv gives you a shell function named:
+Por lo general, la activación de un virtualenv le da una función de shell llamada:
 
 ```bash
 deactivate
 ```
-which puts things back to normal
+Vuelve las cosas a la normalidad
 
 
 Con esto, ya estamos trabajando en el entorno virtual de python
