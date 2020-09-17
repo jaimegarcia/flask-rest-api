@@ -127,15 +127,13 @@ source .venv/bin/activate
 
 ![python-15](images/python-15.png)
 
-Por lo general, la activación de un virtualenv le da una función de shell llamada:
+Con esto, ya estamos trabajando en el entorno virtual de python
+
+Para desactivar el entorno virtual, utilice deactivate
 
 ```bash
 deactivate
 ```
-Vuelve las cosas a la normalidad
-
-
-Con esto, ya estamos trabajando en el entorno virtual de python
 
 
 ### Instalación y Ejecución de Flask
@@ -149,8 +147,11 @@ Flask==1.1.2
 ```
 
 Paquete           # Última versión
+
 Paquete==1.0.4     # Versión específica
+
 Paquete>=1.0.4     # Mínima versión a instalar
+
 Paquete>=1.0,<=2.0 # Instalar última versión mayor a 1 y menor que 2
 
 Dado una Versión MAJOR.MINOR.PATCH ,se hace incremento en cada uno cuando:
@@ -498,16 +499,15 @@ Tipos de Parámetros que acepta Flask
 El verbo que acabamos de utilizar es el GET, existen otros verbos en el Protocolo HTTP, debemos usarlos siempre que sea posible:
 
 
-GET
-- Obtiene un recurso
-POST
-- Agrega un nuevo recurso 
-PUT
-- Actualiza un recurso existente
-PATCH
-- Actualiza de forma parcial un recurso existente
-DELETE
-- Borra un recurso existente
+- GET Obtiene un recurso
+
+- POST Agrega un nuevo recurso 
+
+- PUT Actualiza un recurso existente
+
+- PATCH Actualiza de forma parcial un recurso existente
+
+- DELETE Borra un recurso existente
 
 Si es necesario se puede utilizar otros verbos. La siguiente ruta sería para aprobar la petición 12 del estudiante 1324345
 
@@ -671,6 +671,7 @@ DELETE http://localhost:5000/estudiantes
 Código que indica que la petición se realizó correctamente
 
 200 OK - Respuesta estándar para peticiones correctas.
+
 201 Creado - Recurso creado
 
 **3xx: Redirecciones**
@@ -683,7 +684,6 @@ El cliente tiene que tomar una acción adicional para completar la petición.
 400 Petición Errónea - Hay errores en el formato de datos enviados en la petición
 
 401 No Autorizado - Indica que la persona no está autorizado para acceder a este recurso debido a que no se auténtico
-Similar al 403 Forbidden, pero específicamente para su uso cuando la autentificación es posible pero ha fallado o aún no ha sido provista. Vea autenticación HTTP básica y Digest access authentication.
 
 403 Prohibido - Indica que está prohibido acceder a ese recurso dado los privilegios que tiene el usuario autenticado
 
@@ -701,6 +701,7 @@ El servidor falló al completar la petición
 **Respuesta a GET Obtener Todos los Estudiantes**
 
 Status Code: 200
+
 ```python
 {
   "data": [
@@ -739,7 +740,9 @@ Status Code: 200
 **Respuestas a GET Obtener Estudiante**
 
 ID Existe
+
 Status Code: 200
+
 ```python
 {
   "apellido": "Correa",
@@ -751,7 +754,9 @@ Status Code: 200
 ```
 
 ID No Existe
+
 Status Code: 400
+
 ```python
 {
     "error":"No se encontró ningún estudiante con el ID xxxx"
@@ -761,7 +766,9 @@ Status Code: 400
 **Respuestas a POST Agregar Estudiante**
 
 ID No Existe y la data está completa y correcta
+
 Status Code: 201
+
 ```python
 {
     "cedula":2354656,
@@ -773,7 +780,9 @@ Status Code: 201
 ```
 
 ID Existe
+
 Status Code: 400
+
 ```python
 {
     "error":"Ya existe un estudiante registrando con el ID xxxx"
@@ -781,7 +790,9 @@ Status Code: 400
 ```
 
 Faltan Datos o son Incorrectos
+
 Status Code: 400
+
 ```python
 {
     "error":"Los datos del estudiante no están completos o son incorrectos"
@@ -791,7 +802,9 @@ Status Code: 400
 **Respuestas a PUT Actualizar Estudiante**
 
 ID Existe y la data está completa y correcta
+
 Status Code: 200
+
 ```python
 {
     "cedula":2354656,
@@ -803,7 +816,9 @@ Status Code: 200
 ```
 
 ID No Existe
+
 Status Code: 400
+
 ```python
 {
     "error":"No se encontró ningún estudiante con el ID xxxx"
@@ -811,7 +826,9 @@ Status Code: 400
 ```
 
 Faltan Datos o son Incorrectos
+
 Status Code: 400
+
 ```python
 {
     "error":"Los datos del estudiante no están completos o son incorrectos"
@@ -821,7 +838,9 @@ Status Code: 400
 **Respuestas a DELETE Borrar Estudiante**
 
 ID Existe
+
 Status Code: 200
+
 ```python
 {
     "cedula":2354656,
@@ -830,7 +849,9 @@ Status Code: 200
 ```
 
 ID No Existe
+
 Status Code: 400
+
 ```python
 {
     "error":"No se encontró ningún estudiante con el ID xxxx"
@@ -838,7 +859,9 @@ Status Code: 400
 ```
 
 Faltan Datos o son Incorrectos
+
 Status Code: 400
+
 ```python
 {
     "error":"Los datos del estudiante no están completos o son incorrectos"
