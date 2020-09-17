@@ -102,8 +102,8 @@ VsCode nos va a sugerir que utilicemos pylint para revisar nuestro código, hace
 En Windows hacemos click en el menú de VsCode: Terminal - Nuevo Termina y ejecutamos los siguientes comandos:
 
 ```bash
-py 3 -m venv .venv
-.\venv\Scripts\activate
+py -3 -m venv .venv
+.venv\scripts\activate
 ```
 
 ![python-15](images/python-15.png)
@@ -112,7 +112,7 @@ Si se genera el mensaje "Activate.ps1 is not digitally signed. You cannot run th
 
 ```bash
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
-source .venv/bin/activate
+.venv\scripts\activate
 ```
 
 ![python-16](images/python-16.png)
@@ -309,10 +309,21 @@ Para instalar Rest Client, vaya a extensiones en VSCode busque Rest Client, haga
 
 También puede utilizar Postman. Para instalar Postman, ingrese a https://www.postman.com/, registrese y descargué el producto
 
+Incluyamos las rutas que usamos antes
+
+```python
+### Hola Mundo
+GET http://localhost:5000/
+
+### Saludo
+GET http://localhost:5000/saludo/jaime?titulo=Sr
+```
+
 
 ## Desarrollo de REST API
 
 Vamos a crear una base de datos en un diccionario local
+
 ```python
 estudiantes_db={
   "11234224":{
