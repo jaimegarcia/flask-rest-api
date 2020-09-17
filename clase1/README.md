@@ -47,7 +47,7 @@ Después de terminada la instalación, haga click en Deshabilitar el límite de 
 
 ### Instalación de VSCode
 
-Ingresamos al sitio https://www.python.org/ y le damos click a Download para el sistema operativo que estemos utilizando
+Ingresamos al sitio https://code.visualstudio.com/ y le damos click a Download para el sistema operativo que estemos utilizando
 
 ![python-5](images/python-5.png)
 
