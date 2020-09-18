@@ -41,7 +41,7 @@ Si se genera el mensaje "Activate.ps1 is not digitally signed. You cannot run th
 
 ```bash
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
-source .venv/bin/activate
+sou.\venv\Scripts\activate 
 ```
 
 ![python-16](images/python-16.png)
@@ -50,8 +50,8 @@ source .venv/bin/activate
 Si esta trabajando en MacOs o Linux, ejecute los siguientes comandos
 
 ```bash
-python3 -m venv .venv
 source .venv/bin/activate
+```
 
 Luego, en la misma terminal ejecutamos el siguiente comando:
 
