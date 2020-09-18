@@ -32,7 +32,7 @@ pytz==2020.1
 Debemos tener activo el entorno virtual, si no lo tenemos- Hacemos click en Terminal y ejecutamos los siguientes comandos:
 
 ```bash
-.\venv\Scripts\activate
+.venv\Scripts\activate
 ```
 
 ![python-15](images/python-15.png)
@@ -41,7 +41,7 @@ Si se genera el mensaje "Activate.ps1 is not digitally signed. You cannot run th
 
 ```bash
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
-sou.\venv\Scripts\activate 
+.venv\Scripts\activate 
 ```
 
 ![python-16](images/python-16.png)
