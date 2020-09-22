@@ -10,9 +10,9 @@
 - [Creación de Rutas para Estudiantes](#creación-de-rutas-para-estudiantes)
   - [Agregar Estudiantes](#agregar-estudiantes)
   - [Obtener Estudiantes](#obtener-estudiantes)
+  - [Versionado](#versionado)
+  - [Documentación](#documentación)
   - [Actualizar y Borrar Estudiantes](#actualizar-y-borrar-estudiantes)
-- [Versionado](#versionado)
-- [Documentación](#documentación)
 <!-- tocstop -->
 
 
