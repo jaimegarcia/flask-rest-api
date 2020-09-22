@@ -5,375 +5,718 @@
 
 <!-- toc -->
 
+- [Desarrollo de REST API](#desarrollo-de-rest-api)
+  - [Nuestro Primer Rest API](#nuestro-primer-rest-api)
+  - [Buenas prácticas a la hora de diseñar una REST API](#buenas-prácticas-a-la-hora-de-diseñar-una-rest-api)
+  - [Verbos POST, PUT y DELETE](#verbos-post-put-y-delete)
+  - [Desarrollo de Repuestas de REST API](#desarrollo-de-repuestas-de-rest-api)
+    - [Diseño de Repuestas](#diseño-de-repuestas)
+    - [Programación de Respuestas a Verbo GET](#programación-de-respuestas-a-verbo-get)
+    - [Programación de Respuestas a Verbo POST](#programación-de-respuestas-a-verbo-post)
+    - [Programación de Respuestas a Verbos PUT y DELETE](#programación-de-respuestas-a-verbos-put-y-delete)
 
-- [Creación de Rutas para Peticiones](#creación-de-rutas-para-peticiones)
-  - [Agregar Peticiones](#agregar-peticiones)
-  - [Obtener Peticiones](#obtener-peticiones)
-  - [Actualizar, Aprobar y Borrar Peticiones](#actualizar-aprobar-y-borrar-peticiones)
 
 <!-- tocstop -->
 
-## Creación de Rutas para Peticiones
 
-Continuamos con la ruta de peticiones. Para la Colección de Peticiones utilizaremos como identificador el generado por Firebase
 
-> ¿Por qué no usar un ID con un Auto-incremento u otra alternativa?
+## Desarrollo de REST API
 
-### Agregar Peticiones
-
-Primero vamos a crear el POST para Agregar peticiones relacionadas con un estudiante
+Vamos a crear una base de datos en un diccionario local
 
 ```python
-@app.route("/api/estudiantes/<int:id>/peticiones",methods=['POST'])
-def crear_peticion(id):
-
-    data=request.json
-    estudiante_id=str(id)
-    estudiante_doc=estudiantes_ref.document(estudiante_id)
-
-    if(estudiante_doc.get().exists):
-        try:  
-            nueva_peticion=Peticion(data["cedula"], data["peticion"], data["fecha_atencion"]).to_dict()
-            peticion_ref=peticiones_ref.add(nueva_peticion)
-            nueva_peticion["id"]=peticion_ref[1].id
-
-            return jsonify(nueva_peticion),200
-        except:
-            error_message={"error":"Los datos de la petición no están completos o son incorrectos"}
-            return jsonify(error_message),400
-    else:
-        error_message={"error":f"No se encontró ningún estudiante con el ID {id}"}
-        return jsonify(error_message),400
-```
-
-Probamos con la siguiente petición en Rest Client
-
-```python
-### Agregar Petición
-POST http://localhost:5000/api/estudiantes/{{cedula2}}/peticiones
-Content-Type: application/json
-
-{
-  "cedula":2354659,
-  "peticion":"Asesoría",
-  "fecha_atencion":"25/09/20 7:00:00"
+estudiantes_db={
+  "11234224":{
+    "cedula":11234224,
+    "nombre":"Juana",
+    "apellido":"Correa",
+    "correo":"juana.correa@misena.edu.co",
+    "carrera":"Electrónica"
+  },
+  "12434236":{
+    "cedula":12434236,
+    "nombre":"Jaime",
+    "apellido":"García",
+    "correo":"jaime.garcia@misena.edu.co",
+    "carrera":"Administración"
+  },
+  "61236224":{
+    "cedula":61236224,
+    "nombre":"Roberta",
+    "apellido":"Mejia",
+    "correo":"roberta.mejia@misena.edu.co",
+    "carrera":"Sistemas"
+  },
+  "52433236":{
+    "cedula":52433236,
+    "nombre":"Miriam",
+    "apellido":"Zapata",
+    "correo":"miriam.zapata@misena.edu.co",
+    "carrera":"Sistemas"
+  }
 }
 ```
+> ¿Por qué esta estructura?
 
 
-### Obtener Peticiones
+### Nuestro Primer Rest API
 
-Ahora vamos a generar la ruta GET para obtener todas las peticiones de un estudiantes
-
-```python
-@app.route("/api/estudiantes/<int:id>/peticiones",methods=['GET'])
-def obtener_peticiones(id):
-
-    estudiante_id=str(id)
-    estudiante_doc=estudiantes_ref.document(estudiante_id)
-
-    if(estudiante_doc.get().exists):
-        try:  
-            query = peticiones_ref.where('cedula','==',id).order_by('fecha_atencion')
-            results = query.stream()
-            lista_peticiones=[to_dict_with_id(item) for item in results]
-            return jsonify({"data":lista_peticiones}),200
-        except Exception as err:
-            error_message={"error":"Los datos de la petición no están completos o son incorrectos"}
-            return jsonify(error_message),400
-    else:
-        error_message={"error":f"No se encontró ningún estudiante con el ID {id}"}
-        return jsonify(error_message),400
-```
-
-Para generar la respuesta, vamos a crear una función que tome cada resultado, lo convierta diccionaro y le incluya el id del documento
+Agregamos un Endpoint para obtener los datos de uno de los estudiantes:
 
 
 ```python
-def to_dict_with_id(item):
-    print(item,item.id)
-    item_dict=item.to_dict()
-    item_dict["id"]=item.id
-    return item_dict
+@app.route("/api/estudiantes/<int:id>")
+def obtener_estudiante(id):
+  estudiante=estudiantes_db[str(id)]
+  return f"Estudiante con cédula {id} se llama {estudiante['nombre']} {estudiante['apellido']} y es de la carrera {estudiante['carrera']} "
 ```
 
+Ahora creamos otra ruta para obtener la lista completa de estudiantes:
 
-Cuando ejecutamos la consulta con la petición en Rest Client, vamos a ver que da el siguiente error
-
-```
-GET http://localhost:5000/api/estudiantes/{{cedula2}}/peticiones
-Content-Type: application/json
-```
-
-![composite-index-1](images/composite-index-1.png)
-
-Si vamos al enlace que nos genera el error, nos va a dar la posibilidad de crear un índice compuesto, hacemos click en Crear
-
-![composite-index-2](images/composite-index-2.png)
-
-Después de unos minutos, el índice quedará creado, si volvemos a hacer la consulta, esta vez funcionará correctamente
-
-![composite-index-3](images/composite-index-3.png)
-
-
-
-Este es el código completo que llevamos hasta el momento
-
-
-
-**models**
-
-__init__.py
 ```python
-from .estudiante import Estudiante
-from .peticion import Peticion
+@app.route("/api/estudiantes")
+def obtener_estudiantes():
+  print('Hello world!')  
+  lista_estudiantes=[f"{estudiantes_db[key]['nombre']} {estudiantes_db[key]['apellido']}" for key in estudiantes_db.keys()]
+  return f"Los estudiantes de este curso son {', '.join(lista_estudiantes)}"
 ```
 
-estudiante.py
+El código que llevamos hasta el momento es el siguiente:
+
 ```python
-class Estudiante:
-    def __init__(self, cedula, nombre, apellido, correo, carrera):
-        self.cedula = cedula
-        self.nombre = nombre
-        self.apellido = apellido
-        self.correo = correo
-        self.carrera = carrera
-
-    def to_dict(self):
-        return dict((key, value) for (key, value) in self.__dict__.items())
-```
-
-peticion.py
-```python
-import pytz
-from datetime import datetime
-
-timezone = pytz.timezone("America/Bogota")
-
-class Peticion:
-    def __init__(self, cedula, peticion, fecha_atencion,estado = "Creada"):
-        self.cedula = cedula
-        self.peticion = peticion
-        self.fecha_atencion = timezone.localize(datetime.strptime(fecha_atencion, '%d/%m/%y %H:%M:%S'))
-        self.fecha_creacion = timezone.localize(datetime.now())
-        self.estado = estado
-
-
-    def to_dict(self):
-        return dict((key, value) for (key, value) in self.__dict__.items())
-```
-
-**root**
-
-app.py
-```python
-from flask import Flask, request, jsonify
-from firebase_admin import credentials, firestore, initialize_app
-
-
-from models import Estudiante,Peticion
-
-def to_dict_with_id(item):
-    print(item,item.id)
-    item_dict=item.to_dict()
-    item_dict["id"]=item.id
-    return item_dict
+from flask import Flask,request
+import sys
 
 app = Flask(__name__)
 
-# Inicializar Firestore DB
-cred = credentials.Certificate('key/key.json')
-default_app = initialize_app(cred)
-db = firestore.client()
-estudiantes_ref = db.collection('Estudiantes')
-peticiones_ref = db.collection('Peticiones')
+
+estudiantes_db={
+  "11234224":{
+    "cedula":11234224,
+    "nombre":"Juana",
+    "apellido":"Correa",
+    "correo":"juana.correa@misena.edu.co",
+    "carrera":"Electrónica"
+  },
+  "12434236":{
+    "cedula":12434236,
+    "nombre":"Jaime",
+    "apellido":"García",
+    "correo":"jaime.garcia@misena.edu.co",
+    "carrera":"Administración"
+  },
+  "61236224":{
+    "cedula":61236224,
+    "nombre":"Roberta",
+    "apellido":"Mejia",
+    "correo":"roberta.mejia@misena.edu.co",
+    "carrera":"Sistemas"
+  },
+  "52433236":{
+    "cedula":52433236,
+    "nombre":"Miriam",
+    "apellido":"Zapata",
+    "correo":"miriam.zapata@misena.edu.co",
+    "carrera":"Sistemas"
+  }
+}
+
+@app.route("/api/estudiantes")
+def obtener_estudiantes():
+  print('Hello world!')  
+  lista_estudiantes=[f"{estudiantes_db[key]['nombre']} {estudiantes_db[key]['apellido']}" for key in estudiantes_db.keys()]
+  return f"Los estudiantes de este curso son {', '.join(lista_estudiantes)}"
+
+@app.route("/api/estudiantes/<int:id>")
+def obtener_estudiante(id):
+  estudiante=estudiantes_db[str(id)]
+  return f"Estudiante con cédula {id} se llama {estudiante['nombre']} {estudiante['apellido']} y es de la carrera {estudiante['carrera']} "
 
 
-nuevo_estudiante=Estudiante(122345, "Jaime", "Garcia", "jaime.garcia", "Electronica")
-print(nuevo_estudiante.to_dict())
+
+if __name__ == '__main__':
+    app.run(debug=True)
+```
+
+Acabamos de construir nuestro primer REST API 🥳 
+
+REST (Representational State Transfer) es una interfaz para conectar sistamas basados en el protocolo HTTP. 
+
+Ventajas
+- Nos permite separar el client y el servidor
+- Podemos crear pequeños servicios (microservicios) orientados a una tarea
+- Facilita la escalabilidad, se pueden tener varios servidores con balanceadores de carga
+- REST se ha vuelto un estándar mundial, por lo que la mayoría de desarrolladores sabe trabajar con él
+
+REST es utilizada por la mayoría de empresas de tecnología del mundo, incluyendo a Google, Netflix, Twitter, Amazon, Facebook y Microsoft
+
+### Buenas prácticas a la hora de diseñar una REST API
+
+Use pronombres en plural para indicar los recursos asociados
+```
+estudiantes
+```
+
+El identificador a la derecha del recurso indica que se va a realizar operaciones con el Estudiante con ID 1324345
+
+```
+estudiantes/1324345
+```
+
+Si el recurso tiene asociado otro recurso, esto se puede indicar en el Endpoint de la siguiente forma:
+
+```
+estudiantes/1324345/peticiones
+```
+
+Esto indica que devuelva todas las peticiones del estudiante con ID 1324345
+
+También se puede pedir un recurso específico asociado a otro recurso. Por ejemplo, en la siguiente ruta se estaría pidiendo la petición con ID 12 del estudiante con ID 1324345
+
+```
+estudiantes/1324345/peticiones/12
+```
+
+Utilice los query strings para propiedades no asociadas a los recurso. Por ejemplo
+
+```
+/estudiantes?ordenar=nombre
+/estudiantes?pagina=1
+/estudiantes?formato=json
+```
+
+Tipos de Parámetros que acepta Flask
+
+| Tipo  | Descripción |
+| ------------- | ------------- |
+| string  | Acepta cualquier texto sin slash (definido por defecto). |
+| int  | Admite un entero positivo |
+| path  | Similar a un string, pero se adimiten slashes |
+| uuid  | Admite strings UUID (Identificadores únicos) |
+
+
+El verbo que acabamos de utilizar es el GET, existen otros verbos en el Protocolo HTTP, debemos usarlos siempre que sea posible:
+
+
+- GET Obtiene un recurso
+
+- POST Agrega un nuevo recurso 
+
+- PUT Actualiza un recurso existente
+
+- PATCH Actualiza de forma parcial un recurso existente
+
+- DELETE Borra un recurso existente
+
+Si es necesario se puede utilizar otros verbos. La siguiente ruta sería para aprobar la petición 12 del estudiante 1324345
+
+```
+POST /estudiantes/1324345/peticiones/12/aprobar
+```
+
+
+Respuestas esperadas de cada verbo (Buenas prácticas)
+
+
+| Recurso  | GET | POST | PUT | DELETE |
+| ------------- | ------------- | ------------- | ------------- | ------------- |
+| /estudiantes  | Obtener Lista  | Crear elemento  | Actualizar Batch  | Error |
+| /estudiantes/1324345  | Obtener Elemento  | Error  | Actualizar Elemento  | Borrar Elemento |
+
+
+Idempotencia: Operación que puede ser aplica múltiples veces, sin cambiar el resultado
+
+- GET, PUT, PATCH y DELETE: Idempotentes
+- POST no es idempotente
+
+### Verbos POST, PUT y DELETE
+
+Generemos una ruta con el verbo POST para agregar un nuevo estudiante:
+
+```python
+@app.route("/estudiantes",methods=['POST'])
+def agregar_estudiante():
+    estudiante_id=str(request.json["cedula"])
+    estudiantes_db[estudiante_id]=request.json
+    return f"Estudiante con ID {estudiante_id} agregado"
+```
+
+Si hacemos el POST con Postman o Rest Client, agregamos un nuevo estudiante
+```python
+### Agregar nuevo estudiante
+POST http://localhost:5000/estudiantes
+Content-Type: application/json
+
+{
+  "cedula":2354656,
+  "nombre":"Julian",
+  "apellido":"Parra",
+  "correo":"julian.parra@misena.edu.co",
+  "carrera":"Industrial"
+}
+```
+
+Este es el código que llevamos hasta el momento:
+
+```python
+from flask import Flask,request
+import sys
+
+app = Flask(__name__)
+
+
+estudiantes_db={
+  "11234224":{
+    "cedula":11234224,
+    "nombre":"Juana",
+    "apellido":"Correa",
+    "correo":"juana.correa@misena.edu.co",
+    "carrera":"Electrónica"
+  },
+  "12434236":{
+    "cedula":12434236,
+    "nombre":"Jaime",
+    "apellido":"García",
+    "correo":"jaime.garcia@misena.edu.co",
+    "carrera":"Administración"
+  },
+  "61236224":{
+    "cedula":61236224,
+    "nombre":"Roberta",
+    "apellido":"Mejia",
+    "correo":"roberta.mejia@misena.edu.co",
+    "carrera":"Sistemas"
+  },
+  "52433236":{
+    "cedula":52433236,
+    "nombre":"Miriam",
+    "apellido":"Zapata",
+    "correo":"miriam.zapata@misena.edu.co",
+    "carrera":"Sistemas"
+  }
+}
+
+@app.route("/api/estudiantes")
+def obtener_estudiantes():
+  print('Hello world!')  
+  lista_estudiantes=[f"{estudiantes_db[key]['nombre']} {estudiantes_db[key]['apellido']}" for key in estudiantes_db.keys()]
+  return f"Los estudiantes de este curso son {', '.join(lista_estudiantes)}"
+
+@app.route("/api/estudiantes/<int:id>")
+def obtener_estudiante(id):
+  estudiante=estudiantes_db[str(id)]
+  return f"Estudiante con cédula {id} se llama {estudiante['nombre']} {estudiante['apellido']} y es de la carrera {estudiante['carrera']} "
+
+@app.route("/estudiantes",methods=['POST'])
+def agregar_estudiante():
+    estudiante_id=str(request.json["cedula"])
+    estudiantes_db[estudiante_id]=request.json
+    return f"Estudiante con ID {estudiante_id} agregado"
+
+if __name__ == '__main__':
+    app.run(debug=True)
+```
+
+
+> **Ejercicio**: Complete el código para las rutas con verbos PUT (actualizar toda la información del estudiante a partir de la cédula) y DELETE (eliminar el estudiante a partir de la cédula). Recuerde la función del para borrar atributos de un diccionario
+
+```python
+@app.route("/estudiantes/<int:id>",methods=['PUT'])
+def actualizar_estudiante(id):
+
+@app.route("/estudiantes/<int:id>",methods=['DELETE'])
+def eliminar_estudiante(id):
+```
+
+Estas serían las consultas de Actualización y borrado en Rest Client para que prueben el resultado
+
+```python
+@cedula2=2354656
+### Actualizar estudiante
+PUT http://localhost:5000/estudiantes/{{cedula2}}
+Content-Type: application/json
+
+{
+    "cedula":2354656,
+    "nombre":"Julian",
+    "apellido":"Parras",
+    "correo":"julian.parras@misena.edu.co",
+    "carrera":"Electrónica"
+}
+
+
+### Eliminar estudiante
+DELETE http://localhost:5000/estudiantes/{{cedula2}}
+```
+
+### Desarrollo de Repuestas de REST API
+
+#### Diseño de Repuestas
+
+- Use los códigos de respuesta adecuados
+- Sea consistente (snake_case, camelCase, spinal-case)
+- No expongan datos de servidor
+- No exponga datos privados
+- No exponga datos que puedan generar brechas de seguridad
+
+
+Flask cubre varios de los errores. Intente ejecutar la siguiente petición:
+```
+DELETE http://localhost:5000/estudiantes
+```
+**Códigos de Estado**
+
+**2xx: Peticiones correctas**
+Código que indica que la petición se realizó correctamente
+
+200 OK - Respuesta estándar para peticiones correctas.
+
+201 Creado - Recurso creado
+
+**3xx: Redirecciones**
+El cliente tiene que tomar una acción adicional para completar la petición.
+
+301 Trasladado de forma permanente - El recurso cambio de ruta de forma permanentemente
+
+**4xx: Errores del cliente**
+
+400 Petición Errónea - Hay errores en el formato de datos enviados en la petición
+
+401 No Autorizado - Indica que la persona no está autorizado para acceder a este recurso debido a que no se auténtico
+
+403 Prohibido - Indica que está prohibido acceder a ese recurso dado los privilegios que tiene el usuario autenticado
+
+404 No encontrado - Recurso no encontrado
+
+405 Método no permitido - No puede utilizar ese verbo en la ruta
+
+**5xx: Errores de servidor**
+El servidor falló al completar la petición
+
+500 Error Interno del Servidor - Este error no es debido a la petición sino a problemas en el servidor
+
+**Diseño de Respuestas para Rutas de Estudiantes**
+
+**Respuesta a GET Obtener Todos los Estudiantes**
+
+Status Code: 200
+
+```python
+{
+  "data": [
+    {
+      "apellido": "Correa",
+      "carrera": "Electr\u00f3nica",
+      "cedula": 11234224,
+      "correo": "juana.correa@misena.edu.co",
+      "nombre": "Juana"
+    },
+    {
+      "apellido": "Garc\u00eda",
+      "carrera": "Administraci\u00f3n",
+      "cedula": 12434236,
+      "correo": "jaime.garcia@misena.edu.co",
+      "nombre": "Jaime"
+    },
+    {
+      "apellido": "Mejia",
+      "carrera": "Sistemas",
+      "cedula": 61236224,
+      "correo": "roberta.mejia@misena.edu.co",
+      "nombre": "Roberta"
+    },
+    {
+      "apellido": "Zapata",
+      "carrera": "Sistemas",
+      "cedula": 52433236,
+      "correo": "miriam.zapata@misena.edu.co",
+      "nombre": "Miriam"
+    }
+  ]
+}
+```
+
+**Respuestas a GET Obtener Estudiante**
+
+ID Existe
+
+Status Code: 200
+
+```python
+{
+  "apellido": "Correa",
+  "carrera": "Electr\u00f3nica",
+  "cedula": 11234224,
+  "correo": "juana.correa@misena.edu.co",
+  "nombre": "Juana"
+}
+```
+
+ID No Existe
+
+Status Code: 400
+
+```python
+{
+    "error":"No se encontró ningún estudiante con el ID xxxx"
+}
+```
+
+**Respuestas a POST Agregar Estudiante**
+
+ID No Existe y la data está completa y correcta
+
+Status Code: 201
+
+```python
+{
+    "cedula":2354656,
+    "nombre":"Julian",
+    "apellido":"Parra",
+    "correo":"julian.parras@misena.edu.co",
+    "carrera":"Electrónica"
+}
+```
+
+ID Existe
+
+Status Code: 400
+
+```python
+{
+    "error":"Ya existe un estudiante registrando con el ID xxxx"
+}
+```
+
+Faltan Datos o son Incorrectos
+
+Status Code: 400
+
+```python
+{
+    "error":"Los datos del estudiante no están completos o son incorrectos"
+}
+```
+
+**Respuestas a PUT Actualizar Estudiante**
+
+ID Existe y la data está completa y correcta
+
+Status Code: 200
+
+```python
+{
+    "cedula":2354656,
+    "nombre":"Julian",
+    "apellido":"Parras",
+    "correo":"julian.parras@misena.edu.co",
+    "carrera":"Electrónica"
+}
+```
+
+ID No Existe
+
+Status Code: 400
+
+```python
+{
+    "error":"No se encontró ningún estudiante con el ID xxxx"
+}
+```
+
+Faltan Datos o son Incorrectos
+
+Status Code: 400
+
+```python
+{
+    "error":"Los datos del estudiante no están completos o son incorrectos"
+}
+```
+
+**Respuestas a DELETE Borrar Estudiante**
+
+ID Existe
+
+Status Code: 200
+
+```python
+{
+    "cedula":2354656,
+    "borrado":True
+}
+```
+
+ID No Existe
+
+Status Code: 400
+
+```python
+{
+    "error":"No se encontró ningún estudiante con el ID xxxx"
+}
+```
+
+Faltan Datos o son Incorrectos
+
+Status Code: 400
+
+```python
+{
+    "error":"Los datos del estudiante no están completos o son incorrectos"
+}
+```
+
+#### Programación de Respuestas a Verbo GET
+
+Vamos a incluir dos librerías más de Flask: Jsonify y Abort, para crear las respuestas y abortar peticiones
+
+```python
+from flask import Flask,request,jsonify,abort
+```
 
 
 
-nueva_peticion=Peticion(122345, "Asesoria",'25/09/20 7:00:00')
-print(nueva_peticion.to_dict(),nueva_peticion.fecha_creacion,nueva_peticion.fecha_atencion)
+```python
+@app.route("/estudiantes",methods=['GET'])
+def obtener_estudiantes():
+    lista_estudiantes=[estudiantes_db[key] for key in estudiantes_db.keys()]
+    return jsonify(lista_estudiantes),200
+```
 
+```python
+@app.route("/estudiantes/<int:id>",methods=['GET'])
+def obtener_estudiante(id):
+    try:
+      estudiante=estudiantes_db[str(id)]
+      return jsonify(estudiante),200
+    except:
+      error_message={"error":f"No se encontró ningún estudiante con el ID {id}"}
+      return jsonify(error_message),400
+```
 
-@app.route("/api/estudiantes",methods=['POST'])
+#### Programación de Respuestas a Verbo POST
+
+```python
+@app.route("/estudiantes",methods=['POST'])
 def agregar_estudiante():
 
-    data=request.json
-    estudiante_id=str(request.json["cedula"])
-    estudiante_doc=estudiantes_ref.document(estudiante_id)
-    if(estudiante_doc.get().exists):
-        error_message={"error":f"Ya existe un estudiante registrando con el ID {estudiante_id}"}
-        return jsonify(error_message),400
-    try:  
-        nuevo_estudiante=Estudiante(data["cedula"], data["nombre"], data["apellido"],data["correo"], data["carrera"]).to_dict()
-        estudiante_doc.set(nuevo_estudiante)
-        return jsonify(nuevo_estudiante),201
-    except:
-        error_message={"error":"Los datos del estudiante no están completos o son incorrectos"}
-        return jsonify(error_message),400
+  estudiante_id=str(request.json["cedula"])
+  if(estudiante_id in estudiantes_db):
+    error_message={"error":f"Ya existe un estudiante registrando con el ID {estudiante_id}"}
+    return jsonify(error_message),400
+    
+  try:  
+    nuevo_estudiante=dict()
+    nuevo_estudiante["cedula"]=request.json["cedula"]
+    nuevo_estudiante["nombre"]=request.json["nombre"]
+    nuevo_estudiante["apellido"]=request.json["apellido"]
+    nuevo_estudiante["carrera"]=request.json["carrera"]
+    nuevo_estudiante["correo"]=request.json["correo"]
+    estudiantes_db[estudiante_id]=nuevo_estudiante
+    return jsonify(nuevo_estudiante),201
+  except:
+      error_message={"error":"Los datos del estudiante no están completos o son incorrectos"}
+      return jsonify(error_message),400
+```
 
-@app.route("/api/estudiantes",methods=['GET'])
-def obtener_lista_estudiantes():
 
-    results=estudiantes_ref.stream()
-    lista_estudiantes=[item.to_dict() for item in results]
+Este es el código completo que llevamos hasta el momento:
 
+```python
+from flask import Flask,request,jsonify,abort
+import sys
+
+app = Flask(__name__)
+
+
+estudiantes_db={
+  "11234224":{
+    "cedula":11234224,
+    "nombre":"Juana",
+    "apellido":"Correa",
+    "correo":"juana.correa@misena.edu.co",
+    "carrera":"Electrónica"
+  },
+  "12434236":{
+    "cedula":12434236,
+    "nombre":"Jaime",
+    "apellido":"García",
+    "correo":"jaime.garcia@misena.edu.co",
+    "carrera":"Administración"
+  },
+  "61236224":{
+    "cedula":61236224,
+    "nombre":"Roberta",
+    "apellido":"Mejia",
+    "correo":"roberta.mejia@misena.edu.co",
+    "carrera":"Sistemas"
+  },
+  "52433236":{
+    "cedula":52433236,
+    "nombre":"Miriam",
+    "apellido":"Zapata",
+    "correo":"miriam.zapata@misena.edu.co",
+    "carrera":"Sistemas"
+  }
+}
+
+
+@app.route("/")
+def hola_mundo():
+  print("holas")
+  return "Adiós, Mundo!"
+
+
+@app.route("/saludo/<string:nombre>")
+def saludo(nombre):
+  titulo = request.args.get('titulo', '')
+  return f"Hola {titulo} {nombre}"
+
+
+@app.route("/estudiantes",methods=['GET'])
+def obtener_estudiantes():
+    lista_estudiantes=[estudiantes_db[key] for key in estudiantes_db.keys()]
     return jsonify({"data":lista_estudiantes}),200
 
-@app.route("/api/estudiantes/<int:id>",methods=['GET'])
+@app.route("/estudiantes/<int:id>",methods=['GET'])
 def obtener_estudiante(id):
-
-    estudiante_doc=estudiantes_ref.document(str(id)).get()
-    if(estudiante_doc.exists):
-      return jsonify(estudiante_doc.to_dict()),200
-    else:
+    try:
+      estudiante=estudiantes_db[str(id)]
+      return jsonify(estudiante),200
+    except:
       error_message={"error":f"No se encontró ningún estudiante con el ID {id}"}
       return jsonify(error_message),400
 
 
-@app.route("/api/estudiantes/<int:id>",methods=['PUT'])
-def actualizar_estudiante(id):
+@app.route("/estudiantes",methods=['POST'])
+def agregar_estudiante():
 
-    data=request.json
-    estudiante_id=str(id)
-    estudiante_doc=estudiantes_ref.document(estudiante_id)
-
-    if(estudiante_doc.get().exists):
-        try:  
-            nuevo_estudiante=Estudiante(data["cedula"], data["nombre"], data["apellido"],data["correo"], data["carrera"]).to_dict()
-            estudiantes_ref.document(estudiante_id).update(nuevo_estudiante)
-            return jsonify(nuevo_estudiante),200
-        except:
-            error_message={"error":"Los datos del estudiante no están completos o son incorrectos"}
-            return jsonify(error_message),400
-    else:
-        error_message={"error":f"No se encontró ningún estudiante con el ID {id}"}
-        return jsonify(error_message),400
-
-
-@app.route("/api/estudiantes/<int:id>",methods=['DELETE'])
-def eliminar_estudiante(id):
-
-    estudiante_id=str(id)
-    estudiante_doc=estudiantes_ref.document(estudiante_id)
-
-    if(estudiante_doc.get().exists):
-        estudiante_doc.delete()
-        result={"cedula":id,"borrado":True}
-        return jsonify(result),200
-    else:
-        error_message={"error":f"No se encontró ningún estudiante con el ID {id}"}
-        return jsonify(error_message),400
-
-
-
-@app.route("/api/estudiantes/<int:id>/peticiones",methods=['POST'])
-def crear_peticion(id):
-
-    data=request.json
-    estudiante_id=str(id)
-    estudiante_doc=estudiantes_ref.document(estudiante_id)
-
-    if(estudiante_doc.get().exists):
-        try:  
-            nueva_peticion=Peticion(data["cedula"], data["peticion"], data["fecha_atencion"]).to_dict()
-            peticion_ref=peticiones_ref.add(nueva_peticion)
-            nueva_peticion["id"]=peticion_ref[1].id
-
-            return jsonify(nueva_peticion),200
-        except:
-            error_message={"error":"Los datos de la petición no están completos o son incorrectos"}
-            return jsonify(error_message),400
-    else:
-        error_message={"error":f"No se encontró ningún estudiante con el ID {id}"}
-        return jsonify(error_message),400
-
-
-@app.route("/api/estudiantes/<int:id>/peticiones",methods=['GET'])
-def obtener_peticiones(id):
-
-    estudiante_id=str(id)
-    estudiante_doc=estudiantes_ref.document(estudiante_id)
-
-    if(estudiante_doc.get().exists):
-        try:  
-            query = peticiones_ref.where('cedula','==',id).order_by('fecha_atencion')
-            results = query.stream()
-            lista_peticiones=[to_dict_with_id(item) for item in results]
-            return jsonify({"data":lista_peticiones}),200
-        except Exception as err:
-            error_message={"error":"Los datos de la petición no están completos o son incorrectos"}
-            return jsonify(error_message),400
-    else:
-        error_message={"error":f"No se encontró ningún estudiante con el ID {id}"}
-        return jsonify(error_message),400
-
+  estudiante_id=str(request.json["cedula"])
+  if(estudiante_id in estudiantes_db):
+    error_message={"error":f"Ya existe un estudiante registrando con el ID {estudiante_id}"}
+    return jsonify(error_message),400
+    
+  try:  
+    nuevo_estudiante=dict()
+    nuevo_estudiante["cedula"]=request.json["cedula"]
+    nuevo_estudiante["nombre"]=request.json["nombre"]
+    nuevo_estudiante["apellido"]=request.json["apellido"]
+    nuevo_estudiante["carrera"]=request.json["carrera"]
+    nuevo_estudiante["correo"]=request.json["correo"]
+    estudiantes_db[estudiante_id]=nuevo_estudiante
+    return jsonify(nuevo_estudiante),201
+  except:
+      error_message={"error":"Los datos del estudiante no están completos o son incorrectos"}
+      return jsonify(error_message),400
 ```
 
-### Actualizar, Aprobar y Borrar Peticiones
-
-> **Ejercicio**: Realizar las rutas GET para Obtener una Petición, PATCH para Actualización del Estado, PUT para Actualizarla completamente y DELETE para borrarla
-
-Utilice este código base
-```python
-@app.route("/api/estudiantes/<int:id>/peticiones/<string:pid>",methods=['GET','PATCH','PUT','DELETE'])
-def procesar_peticion(id,pid):
+#### Programación de Respuestas a Verbos PUT y DELETE
 
 
-    if(request.method=='GET'):
-
-    elif(request.method=='PATCH'):
-
-    elif(request.method=='PUT'):
-
-    else:
-
-```
-
-Pruebe con las siguientes peticiones de Rest Client. Reemplazando el último valor por el ID de la petición de Prueba
-(Intente construir las peticiones usted mismo)
-
-
-```python
-### Obtener Petición
-GET http://localhost:5000/api/estudiantes/{{cedula2}}/peticiones/wlgEDbpHw6A1v7iqHLbN
-Content-Type: application/json
+> Ejercicio: Programe las respuestas para los verbos PUT y DELETE
 
 
 
-### Aprobar Petición
-PATCH http://localhost:5000/api/estudiantes/{{cedula2}}/peticiones/wlgEDbpHw6A1v7iqHLbN
-Content-Type: application/json
 
-{
-  "estado": "Aprobada"
-}
 
-### Actualizar Petición
-PUT http://localhost:5000/api/estudiantes/{{cedula2}}/peticiones/wlgEDbpHw6A1v7iqHLbN
-Content-Type: application/json
-
-{
-  "cedula":2354659,
-  "peticion":"Asesoría",
-  "fecha_atencion":"25/09/20 15:00:00",
-  "estado": "Aprobada"
-}
-
-### Borrar Petición
-DELETE http://localhost:5000/api/estudiantes/{{cedula2}}/peticiones/wlgEDbpHw6A1v7iqHLbN
-Content-Type: application/json
-```
-
-Versionado
-
-¿Por qué versionar?
-- Los usarios confían en que la API no cambie
-- Esto inevatible, los requirimientos cambian y el API debe cambiar
-- El versionado es una solución para mantener soporte a los usuarios a la vez que se cubren nuevas funcionalidades
-
-Ejemplo:
-/v1/estudiantes/1324345/petciones
