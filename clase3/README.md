@@ -140,7 +140,9 @@ if __name__ == '__main__':
 
 Acabamos de construir nuestro primer REST API 🥳 
 
-REST (Representational State Transfer) es una interfaz para conectar sistamas basados en el protocolo HTTP. 
+REST (Representational State Transfer) es una interfaz para conectar sistemas basados en el protocolo HTTP.
+
+Video con explicación en español sobre REST APIs: https://www.youtube.com/watch?v=u2Ms34GE14U
 
 Ventajas
 - Nos permite separar el client y el servidor
@@ -224,7 +226,7 @@ Respuestas esperadas de cada verbo (Buenas prácticas)
 | /estudiantes/1324345  | Obtener Elemento  | Error  | Actualizar Elemento  | Borrar Elemento |
 
 
-Idempotencia: Operación que puede ser aplica múltiples veces, sin cambiar el resultado
+Idempotencia: Operación que puede ser aplicada múltiples veces, sin cambiar el resultado
 
 - GET, PUT, PATCH y DELETE: Idempotentes
 - POST no es idempotente
@@ -234,7 +236,7 @@ Idempotencia: Operación que puede ser aplica múltiples veces, sin cambiar el r
 Generemos una ruta con el verbo POST para agregar un nuevo estudiante:
 
 ```python
-@app.route("/estudiantes",methods=['POST'])
+@app.route("/api/estudiantes",methods=['POST'])
 def agregar_estudiante():
     estudiante_id=str(request.json["cedula"])
     estudiantes_db[estudiante_id]=request.json
@@ -244,7 +246,7 @@ def agregar_estudiante():
 Si hacemos el POST con Postman o Rest Client, agregamos un nuevo estudiante
 ```python
 ### Agregar nuevo estudiante
-POST http://localhost:5000/estudiantes
+POST http://localhost:5000/api/estudiantes
 Content-Type: application/json
 
 {
@@ -307,7 +309,7 @@ def obtener_estudiante(id):
   estudiante=estudiantes_db[str(id)]
   return f"Estudiante con cédula {id} se llama {estudiante['nombre']} {estudiante['apellido']} y es de la carrera {estudiante['carrera']} "
 
-@app.route("/estudiantes",methods=['POST'])
+@app.route("/api/estudiantes",methods=['POST'])
 def agregar_estudiante():
     estudiante_id=str(request.json["cedula"])
     estudiantes_db[estudiante_id]=request.json
@@ -321,10 +323,10 @@ if __name__ == '__main__':
 > **Ejercicio**: Complete el código para las rutas con verbos PUT (actualizar toda la información del estudiante a partir de la cédula) y DELETE (eliminar el estudiante a partir de la cédula). Recuerde la función del para borrar atributos de un diccionario
 
 ```python
-@app.route("/estudiantes/<int:id>",methods=['PUT'])
+@app.route("/api/estudiantes/<int:id>",methods=['PUT'])
 def actualizar_estudiante(id):
 
-@app.route("/estudiantes/<int:id>",methods=['DELETE'])
+@app.route("/api/estudiantes/<int:id>",methods=['DELETE'])
 def eliminar_estudiante(id):
 ```
 
@@ -333,7 +335,7 @@ Estas serían las consultas de Actualización y borrado en Rest Client para que 
 ```python
 @cedula2=2354656
 ### Actualizar estudiante
-PUT http://localhost:5000/estudiantes/{{cedula2}}
+PUT http://localhost:5000/api/estudiantes/{{cedula2}}
 Content-Type: application/json
 
 {
@@ -346,7 +348,7 @@ Content-Type: application/json
 
 
 ### Eliminar estudiante
-DELETE http://localhost:5000/estudiantes/{{cedula2}}
+DELETE http://localhost:5000/api/estudiantes/{{cedula2}}
 ```
 
 ### Desarrollo de Repuestas de REST API
@@ -362,7 +364,7 @@ DELETE http://localhost:5000/estudiantes/{{cedula2}}
 
 Flask cubre varios de los errores. Intente ejecutar la siguiente petición:
 ```
-DELETE http://localhost:5000/estudiantes
+DELETE http://localhost:5000/api/estudiantes
 ```
 **Códigos de Estado**
 
@@ -578,7 +580,7 @@ from flask import Flask,request,jsonify,abort
 
 
 ```python
-@app.route("/estudiantes",methods=['GET'])
+@app.route("/api/estudiantes",methods=['GET'])
 def obtener_estudiantes():
     lista_estudiantes=[estudiantes_db[key] for key in estudiantes_db.keys()]
     return jsonify(lista_estudiantes),200
@@ -598,7 +600,7 @@ def obtener_estudiante(id):
 #### Programación de Respuestas a Verbo POST
 
 ```python
-@app.route("/estudiantes",methods=['POST'])
+@app.route("/api/estudiantes",methods=['POST'])
 def agregar_estudiante():
 
   estudiante_id=str(request.json["cedula"])
@@ -674,7 +676,7 @@ def saludo(nombre):
   return f"Hola {titulo} {nombre}"
 
 
-@app.route("/estudiantes",methods=['GET'])
+@app.route("/api/estudiantes",methods=['GET'])
 def obtener_estudiantes():
     lista_estudiantes=[estudiantes_db[key] for key in estudiantes_db.keys()]
     return jsonify({"data":lista_estudiantes}),200
@@ -689,7 +691,7 @@ def obtener_estudiante(id):
       return jsonify(error_message),400
 
 
-@app.route("/estudiantes",methods=['POST'])
+@app.route("/api/estudiantes",methods=['POST'])
 def agregar_estudiante():
 
   estudiante_id=str(request.json["cedula"])

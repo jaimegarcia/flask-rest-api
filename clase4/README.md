@@ -138,14 +138,14 @@ from firebase_admin import credentials, firestore, initialize_app
 from models import Estudiante,Peticion
 ```
 
-Probemos crear una instancia de cada modelo para verificar que quedo bien
+Probemos crear una instancia de cada modelo para verificar que quedó bien
 ```python
 nuevo_estudiante=Estudiante(122345, "Jaime", "Garcia", "jaime.garcia", "Electronica")
 print(nuevo_estudiante.to_dict())
 ```
 
 
-Ahora creamos una peticion de prueba
+Ahora creamos una petición de prueba
 ```python
 nueva_peticion=Peticion(122345, "Asesoria",'25/09/20 7:00:00')
 print(nueva_peticion.to_dict(),nueva_peticion.fecha_creacion,nueva_peticion.fecha_atencion)
