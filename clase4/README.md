@@ -392,7 +392,9 @@ Content-Type: application/json
 DELETE http://localhost:5000/api/v1/estudiantes/{{cedula2}}
 ```
 
-**EJERCICIO FINAL**
+# EJERCICIO FINAL
+
+Crear todas las rutas para la coleccione de peticiones enlazada con la de estudiantes, con sus respectivas consultas a la base de datos
 
 ## Creación de Rutas para Peticiones
 
