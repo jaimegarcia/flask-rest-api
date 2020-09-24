@@ -152,7 +152,7 @@ REST es utilizada por la mayoría de empresas de tecnología del mundo, incluyen
 
 ### Buenas prácticas a la hora de diseñar una REST API
 
-Use pronombres en plural para indicar los recursos asociados
+Use nombres en plural para indicar los recursos asociados
 ```
 estudiantes
 ```
